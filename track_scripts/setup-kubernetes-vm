@@ -1,0 +1,412 @@
+#!/bin/bash 
+
+echo "Bootstrap script start"
+echo ""
+
+# Function to retry a command with exponential backoff
+retry_command() {
+    local max_attempts=8
+    local timeout=1
+    local attempt=1
+    local exit_code=0
+
+    while [ $attempt -le $max_attempts ]
+    do
+        "$@"
+        exit_code=$?
+
+        if [ $exit_code -eq 0 ]; then
+            break
+        fi
+
+        echo "Attempt $attempt failed! Retrying in $timeout seconds..."
+        sleep $timeout
+        attempt=$(( attempt + 1 ))
+        timeout=$(( timeout * 2 ))
+    done
+
+    if [ $exit_code -ne 0 ]; then
+        echo "Command $@ failed after $attempt attempts!"
+    fi
+
+    return $exit_code
+}
+
+echo "Waiting for Instruqt host bootstrap to finish"
+# Wait for the Instruqt host bootstrap to finish
+retry_command test -f /opt/instruqt/bootstrap/host-bootstrap-completed 
+echo ""
+
+echo "Waiting for ks8 API server to become available"
+# Wait for the Kubernetes API server to become available
+retry_command curl --silent --show-error --fail --output /dev/null http://localhost:8001/api 
+echo ""
+
+# Enable bash completion for kubectl
+echo "source /usr/share/bash-completion/bash_completion" >> /root/.bashrc
+echo "complete -F __start_kubectl k" >> /root/.bashrc
+
+echo "Install package updates, gginx, python3, and pip3"
+echo ""
+# Update apt packages and install ngix, python3 and pip3
+{ apt-get update; apt-get -q install nginx python3 python3-pip -y; } &
+
+echo "Installing ECK CRD and Operator"
+kubectl create -f https://download.elastic.co/downloads/eck/2.15.0/crds.yaml
+kubectl apply -f https://download.elastic.co/downloads/eck/2.15.0/operator.yaml
+echo ""
+
+echo "Creating Elastic cluster in k8s"
+cat <<EOF | kubectl apply -f -
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: kibana
+  namespace: default
+spec:
+  version: 8.17.0
+  count: 1
+  elasticsearchRef:
+    name: elasticsearch
+  http:
+    tls:
+      selfSignedCertificate:
+        disabled: true
+  config:
+    server.publicBaseUrl: http://localhost:30002
+    #elastic:
+    #  apm:
+    #    active: true
+    #    serverUrl: "http://apm.default.svc:8200"
+    #    secretToken: pkcQROVMCzYypqXs0b
+    telemetry.optIn: false
+---
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: elasticsearch
+  namespace: default
+spec:
+  version: 8.17.0
+  http:
+    tls:
+      selfSignedCertificate:
+        disabled: true
+  nodeSets:
+  - name: default
+    count: 1
+    config:
+      node.store.allow_mmap: false
+      # default is 30, but we need a bit more capacity for elser
+      xpack.ml.max_machine_memory_percent: 35
+    podTemplate:
+      spec:
+        containers:
+        - name: elasticsearch
+          resources:
+            requests:
+              memory: 6Gi
+            limits:
+              memory: 6Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+  namespace: default
+spec:
+  selector:
+    kibana.k8s.elastic.co/name: kibana
+  ports:
+  - protocol: TCP
+    nodePort: 30002
+    port: 5601
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+  namespace: default
+spec:
+  selector:
+    elasticsearch.k8s.elastic.co/cluster-name: elasticsearch
+  ports:
+  - protocol: TCP
+    nodePort: 30920
+    port: 9200
+  type: NodePort
+EOF
+
+echo "Done creating Elastic cluster in k8s"
+echo ""
+
+# Wait until Elasticsearch pods to be created and ready
+echo 'Waiting for Elasticsearch pods to be created'
+retry_command kubectl get pods -n default | grep -q elasticsearch 
+echo ""
+
+echo 'Waiting for all pods to be ready'
+retry_command kubectl wait pod -n default -l common.k8s.elastic.co/type --for=condition=Ready --timeout=30s
+echo ""
+
+echo 'Waiting for Kibana'
+retry_command kubectl get pods -n default | grep -q kibana 
+echo 'Waiting for all pods to be ready'
+retry_command kubectl wait pod -n default -l common.k8s.elastic.co/type --for=condition=Ready --timeout=60s
+echo ""
+
+# Store settings in .env file
+echo 'ELASTICSEARCH_USERNAME=elastic' >> /root/.env
+# echo without newline
+echo -n 'ELASTICSEARCH_PASSWORD=' >> /root/.env
+# read password from kubectl get secret elasticsearch-es-elastic-user -o go-template='{{.data.elastic | base64decode}}', save to file as ELASTICSEARCH_PASSWORD=$value
+kubectl get secret elasticsearch-es-elastic-user -n default -o go-template='{{.data.elastic | base64decode}}' >> /root/.env
+echo '' >> /root/.env
+
+echo 'ELASTICSEARCH_URL="http://localhost:30920"' >> /root/.env
+echo 'KIBANA_URL="http://localhost:30002"' >> /root/.env
+echo 'BUILD_NUMBER="10"' >> /root/.env
+echo 'ELASTIC_VERSION="8.15.1"' >> /root/.env
+
+echo 'ELASTIC_APM_SERVER_URL=http://apm.default.svc:8200' >> /root/.env
+echo 'ELASTIC_APM_SECRET_TOKEN=pkcQROVMCzYypqXs0b' >> /root/.env
+
+export $(cat /root/.env | xargs) 
+
+# BASE64 username and password for use with curl basic auth
+BASE64=$(echo -n "elastic:${ELASTICSEARCH_PASSWORD}" | base64)
+
+KIBANA_URL_WITHOUT_PROTOCOL=$(echo $KIBANA_URL | sed -e 's#http[s]\?://##g')
+
+ulimit -n 16384
+
+echo "Setting up Nginx configuration"
+echo '
+upstream keepalive-upstream {
+  server '${KIBANA_URL_WITHOUT_PROTOCOL}';
+  server '${KIBANA_URL_WITHOUT_PROTOCOL}';
+  server '${KIBANA_URL_WITHOUT_PROTOCOL}';
+  keepalive 64;
+}
+
+server { 
+  listen 30001 default_server;
+  server_name kibana;
+  location /nginx_status {
+    stub_status on;
+    allow 127.0.0.1;
+    deny all;
+  }
+  location / {
+    proxy_set_header Host '${KIBANA_URL_WITHOUT_PROTOCOL}';
+    proxy_pass http://keepalive-upstream;
+    proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
+    proxy_set_header Connection "";
+    proxy_hide_header Content-Security-Policy;
+    proxy_set_header X-Scheme $scheme;
+    proxy_set_header Authorization "Basic '${BASE64}'";
+    proxy_set_header Accept-Encoding "";
+    proxy_redirect off;
+    proxy_http_version 1.1;
+    client_max_body_size 20M;
+    proxy_read_timeout 600;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains;";
+    proxy_send_timeout          300;
+    send_timeout                300;
+    proxy_connect_timeout       300;
+ }
+}
+
+server {
+  listen 9200;
+  server_name elasticsearch;
+  
+  location / {
+    proxy_pass http://localhost:30920;
+    proxy_connect_timeout       300;
+    proxy_send_timeout          300;
+    proxy_read_timeout          300;
+    send_timeout                300;
+  }
+}
+' > /etc/nginx/conf.d/default.conf
+echo ""
+
+# Enable trial license
+echo "Enabling trial license"
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Secret
+metadata:
+  name: eck-trial-license
+  namespace: elastic-system
+  labels:
+    license.k8s.elastic.co/type: enterprise_trial
+  annotations:
+    elastic.co/eula: accepted 
+EOF
+echo ""
+
+echo '127.0.0.1 elasticsearch-es-http.default.svc' >> /etc/hosts
+
+systemctl restart nginx
+
+echo "Setting up k8s ingress"
+echo '
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: apm-ing
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: "apm.kubernetes-vm.$_SANDBOX_ID.instruqt.io"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: apm-lb
+            port:
+              number: 8200
+' > /root/ingress-apm.yaml
+
+envsubst < /root/ingress-apm.yaml | kubectl apply -f -
+echo ""
+
+echo "Setting up k8s service for Kibana"
+echo '
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana-lb
+  namespace: default
+spec:
+  ports:
+  - name: kibana-lb
+    port: 5601
+    protocol: TCP
+    targetPort: 5601
+  selector:
+    kibana.k8s.elastic.co/name: kibana
+  type: LoadBalancer
+' > /root/kibana-lb.yaml
+
+kubectl apply -f /root/kibana-lb.yaml
+echo ""
+
+echo "Setting up Traefik"
+kubectl apply -f https://raw.githubusercontent.com/traefik/traefik/v2.10/docs/content/reference/dynamic-configuration/kubernetes-crd-definition-v1.yml
+echo ""
+
+
+export AUTH=$(echo -n "elastic:$(kubectl get secret elasticsearch-es-elastic-user -n default -o go-template='{{.data.elastic | base64decode}}')" | base64 -w0)
+
+echo "Setting up k8s middelware for Traefik"
+# middleware that sets request and response header to dummy value
+echo '
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: set-upstream-basic-auth
+spec:
+  headers:
+    customRequestHeaders:
+      X-Request-Id: "123"
+      Authorization: "Basic $AUTH"
+    customResponseHeaders:
+      X-Response-Id: "4567"
+' > /root/middleware.yaml
+
+envsubst < /root/middleware.yaml | kubectl apply -f -
+echo ""
+
+echo "Setting up k8s ingress in Traefix for Kibana"
+# ingress route for kibana
+echo '
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: kibana-ing
+  namespace: default
+spec:
+  entryPoints:
+    - websecure
+  routes:
+  - match: Host(`kibana.kubernetes-vm.$_SANDBOX_ID.instruqt.io`) && PathPrefix(`/`)
+    kind: Rule
+    services:
+    - name: kibana-lb
+      port: 5601
+    middlewares:
+    - name: set-upstream-basic-auth
+' > /root/ingress-kibana.yaml
+
+envsubst < /root/ingress-kibana.yaml | kubectl apply -f -
+echo ""
+
+# Download sample data from Dropbox share
+echo "Downloading sample data"
+mkdir elastic-geospatial-workshop
+cd elastic-geospatial-workshop
+retry_command wget -q -r "https://www.dropbox.com/scl/fo/qvi7j9c2np1dxmb2j5djp/AIFtobJY3pZuorWzpa5pSq0?rlkey=yqzx7mylg67x06a7feniubm72&st=umyakvrj&dl=1" -O files.zip
+unzip files.zip 
+echo "Download sample data complete"
+echo ""
+
+# Upload Elasticsearch Trimet index template
+echo "Uploading Elasticsearch index template for sample data"
+retry_command curl --silent --show-error --fail -X PUT "$ELASTICSEARCH_URL/_index_template/trimet-geo-workshop-template" \
+-H "Content-Type: application/json" \
+-H "Authorization: Basic $BASE64" \
+-d @trimet-geo-workshop-index-template.json
+echo "Upload Elasticsearch index template complete"
+echo ""
+
+# Upload Elasticsearch Portland GeoJSON index template
+echo "Uploading Elasticsearch index template for Portland GeoJSON data"
+retry_command curl --silent --show-error --fail -X PUT "$ELASTICSEARCH_URL/_index_template/portland-geojson-template" \
+-H "Content-Type: application/json" \
+-H "Authorization: Basic $BASE64" \
+-d @portland-geojson-index-template.json
+echo "Upload Elasticsearch index template complete"
+echo ""
+
+# Install required Python libraries
+echo "Installing Python libraries"
+pip install -q argparse elasticsearch tqdm
+echo "Installation Python libraries complete"
+echo ""
+
+# Upload CSV data to Elasticsearch
+echo "Uploading Trimet CSV data to Elasticsearch"
+python3 upload-csv-elasticsearch.py --csv trimet-geo-workshop-data.csv --host $ELASTICSEARCH_URL --password $ELASTICSEARCH_PASSWORD
+echo ""
+
+# Upload GeoJSON data to Elasticsearch
+echo "Uploading GeoJSON data to Elasticsearch"
+python3 upload-geojson-elasticsearch.py --json portland-geojson.json --host $ELASTICSEARCH_URL --password $ELASTICSEARCH_PASSWORD
+echo ""
+
+# Upload Trimet dataview to Kibana"
+echo "Uploading Trimet dataview to Kibana"
+curl \
+ -X POST $KIBANA_URL/api/data_views/data_view \
+ -H "Authorization: Basic $BASE64" \
+ -H "Content-Type: application/json; Elastic-Api-Version=2023-10-31" \
+ -H "kbn-xsrf: string" \
+ -d @trimet-geo-workshop-dataview.json
+echo "Upload Kibana dataview complete"
+echo ""
+
+echo "Upload complete"
+echo ""
+
+echo "Bootstrap script completed successfully!"
+echo ""

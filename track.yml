@@ -1,0 +1,93 @@
+slug: geo-workshop
+id: mzdies7fq3jy
+title: Geospatial Workshop [WIP]
+description: This workshop is designed to give users exposure to Elasticsearch's geospatial
+  capabilities for their data analysis and investigation needs.
+icon: ./assets/icon-gis-64-color.png
+tags:
+- eck 2.15.0
+- wip
+- testing
+- geospatial
+- elastic 8.17.0
+- geo
+owner: elastic
+developers:
+- eric.cobb@elastic.co
+- michael.young@elastic.co
+instructors:
+- andrew.meyers@elastic.co
+- eric.cobb@elastic.co
+- arthur.eyckerman@elastic.co
+- banjo.donila@elastic.co
+- eric.lehman@elastic.co
+- jonpaul.sepulveres@elastic.co
+- jack.kulp@elastic.co
+- bharath@elastic.co
+- maurizio.romani@elastic.co
+- mikkel.kidmose@elastic.co
+- michael.young@elastic.co
+- eric.xue@elastic.co
+- jesse.dijkstra@elastic.co
+- lokesh.bhasin@elastic.co
+- rajesh.menon@elastic.co
+- eduardo.xavier@elastic.co
+- josh.asres@elastic.co
+- mike.wong@elastic.co
+- larry.hernandez@elastic.co
+- will.markham@elastic.co
+- annamaria.modee@elastic.co
+- adi.wasserman@elastic.co
+- balazs@elastic.co
+- william.d.pitt@elastic.co
+- brad.timmerman@elastic.co
+- carles.campos@elastic.co
+- carlos.guzman@elastic.co
+- charles.walton@elastic.co
+- chris.pinto@elastic.co
+- danielle.silva@elastic.co
+- edgar.arroyo@elastic.co
+- florian.jacobs@elastic.co
+- frank.gutierrez@elastic.co
+- gzim.xheladini@elastic.co
+- ido.friedman@elastic.co
+- jonathan.wilson@elastic.co
+- jesse.wilson@elastic.co
+- julian.andre@elastic.co
+- julio.gomezortega@elastic.co
+- soonhow.ko@elastic.co
+- kunal.kusoorkar@elastic.co
+- kyle.rozanitis@elastic.co
+- markus.klose@elastic.co
+- matthias.holzgethan@elastic.co
+- michael.luer@elastic.co
+- muthu.muthupalaniappan@elastic.co
+- oscar.cabanillas@elastic.co
+- nicholas.palmer@elastic.co
+- ravindra.ramnani@elastic.co
+- nicole.albee@elastic.co
+- rema.subramanian@elastic.co
+- tyler.strong@elastic.co
+- saran.gajendran@elastic.co
+- scott.karter@elastic.co
+- ryan.chen@elastic.co
+- siddharth.dwivedi@elastic.co
+- lasse.byrnak@elastic.co
+- richard.im@elastic.co
+maintenance: true
+show_timer: true
+idle_timeout: 3600
+timelimit: 7200
+lab_config:
+  sidebar_enabled: true
+  feedback_recap_enabled: true
+  feedback_tab_enabled: true
+  loadingMessages: true
+  theme:
+    name: modern-dark
+  override_challenge_layout: false
+  hideStopButton: true
+  default_layout: AssignmentRight
+  default_layout_sidebar_size: 33
+checksum: "248773477097803527"
+enhanced_loading: false
