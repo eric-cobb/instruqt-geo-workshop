@@ -37,7 +37,7 @@ retry_command() {
 report_status()
 {
     echo ""
-    echo "$@"
+    echo -e "$@"
     echo ""
 }
 
@@ -69,7 +69,7 @@ BASE64=$(echo -n "elastic:${ES_LOCAL_PASSWORD}" | base64)
 report_status "Downloading sample data"
 mkdir $SCRIPT_DIR/workshop-data
 cd  $SCRIPT_DIR/workshop-data
-retry_command wget -q -r "https://www.dropbox.com/scl/fo/qvi7j9c2np1dxmb2j5djp/AIFtobJY3pZuorWzpa5pSq0?rlkey=yqzx7mylg67x06a7feniubm72&st=umyakvrj&dl=1" -O files.zip
+retry_command wget -q -r "https://www.dropbox.com/scl/fo/5klueqzd01rsuoh9l84ui/AKabsZrOfsnsjHwDdXuQ8Xc?rlkey=0sndaf9qk0ykgtq8l4qasnjst&st=ub7url9i&dl=1" -O files.zip
 unzip files.zip -x /
 report_status " -- complete"
 
@@ -115,4 +115,4 @@ curl \
 report_status " -- complete"
 
 report_status "Local Development Environment Setup Complete"
-report_status "Elasticsearch URL: $ES_LOCAL_URL\n Elasticsearch Username: elastic\n Elasticsearch Password: $ES_LOCAL_PASSWORD"
+report_status "Elasticsearch URL: $ES_LOCAL_URL\nElasticsearch Username: elastic\nElasticsearch Password: $ES_LOCAL_PASSWORD"
