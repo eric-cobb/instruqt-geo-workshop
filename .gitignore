@@ -1,0 +1,5 @@
+# Don't want to checking Elastic Start-Local
+elastic-start-local/
+
+# Don't want to check in the data files as they are pulled from Dropbox (for now)
+workshop-data/
