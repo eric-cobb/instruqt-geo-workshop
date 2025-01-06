@@ -1,1 +1,0 @@
-# instruqt-geo-workshop
