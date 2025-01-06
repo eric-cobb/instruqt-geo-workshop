@@ -355,7 +355,7 @@ echo ""
 echo "Downloading sample data"
 mkdir elastic-geospatial-workshop
 cd elastic-geospatial-workshop
-retry_command wget -q -r "https://www.dropbox.com/scl/fo/qvi7j9c2np1dxmb2j5djp/AIFtobJY3pZuorWzpa5pSq0?rlkey=yqzx7mylg67x06a7feniubm72&st=umyakvrj&dl=1" -O files.zip
+retry_command wget -q -r "https://www.dropbox.com/scl/fo/5klueqzd01rsuoh9l84ui/AKabsZrOfsnsjHwDdXuQ8Xc?rlkey=0sndaf9qk0ykgtq8l4qasnjst&st=jd5q74pz&dl=1" -O files.zip
 unzip files.zip 
 echo "Download sample data complete"
 echo ""
