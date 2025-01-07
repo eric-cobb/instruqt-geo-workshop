@@ -108,7 +108,7 @@ PIP3=$PYTHON_ENV/bin/pip3
 
 # Install required Python libraries
 report_status "Installing Python libraries"
-$PIP3 install -q argparse elasticsearch tqdm
+$PIP3 install -q argparse elasticsearch tqdm pip --upgrade
 report_status " -- complete"
 
 # Upload CSV data to Elasticsearch
