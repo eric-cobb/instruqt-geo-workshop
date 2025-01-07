@@ -6,3 +6,7 @@ workshop-data/
 
 # Don't want to check in env files
 .env
+
+# Don't want to check in the Python virtual environment
+venv
+.venv
