@@ -108,12 +108,12 @@ report_status " -- complete"
 
 # Upload CSV data to Elasticsearch
 report_status "Uploading Trimet CSV data to Elasticsearch"
-$SCRIPT_DIR/.venv/python3 upload-csv-elasticsearch.py --csv trimet-geo-workshop-data.csv --host $ES_LOCAL_URL --password $ES_LOCAL_PASSWORD
+$SCRIPT_DIR/.venv/bin/python3 upload-csv-elasticsearch.py --csv trimet-geo-workshop-data.csv --host $ES_LOCAL_URL --password $ES_LOCAL_PASSWORD
 report_status " -- complete"
 
 # Upload GeoJSON data to Elasticsearch
 report_status "Uploading GeoJSON data to Elasticsearch"
-$SCRIPT_DIR/.venv/python3 upload-geojson-elasticsearch.py --json portland-geojson.json --host $ES_LOCAL_URL --password $ES_LOCAL_PASSWORD
+$SCRIPT_DIR/.venv/bin/python3 upload-geojson-elasticsearch.py --json portland-geojson.json --host $ES_LOCAL_URL --password $ES_LOCAL_PASSWORD
 report_status " -- complete"
 
 # Upload Trimet dataview to Kibana"
