@@ -64,8 +64,8 @@ If you need a fresh Elastic cluster, you can  run `docker compose down` in the `
 cd local-dev/elastic-start-local; docker compose down
 ```
 
-Once the containers are removed, then you can run the start command previously shown above.  This will create a new Elastic
-cluster using the previously created `local-dev/elastic-start-local/.env file` for settings.
+Once the containers are removed, then you can run `cd local-dev/elastic-start-local/; ./start.sh` which will recreate the
+Elastic cluster using the previously created `local-dev/elastic-start-local/.env file`.
 
 Elastic Start-Local creates default passwords and api keys and stores them in `local-dev/elastic-start-local/.env`. If you
 need to log into the local Elasticsearch or Kibana instance, you can find the passwords in the `.env` file.
