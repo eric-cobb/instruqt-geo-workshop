@@ -65,6 +65,15 @@ report_status " -- complete"
 # BASE64 username and password for use with curl basic auth
 BASE64=$(echo -n "elastic:${ES_LOCAL_PASSWORD}" | base64)
 
+# Check of Python .venv
+report_status "Checking for Python .venv"
+if [ ! -d "$SCRIPT_DIR/.venv" ]; then
+    report_status " Python .venv does not exist, creating"
+    python3 -m venv $SCRIPT_DIR/.venv
+    report_status " -- complete"
+fi
+report-status "Python .venv exists"
+
 # Download sample data from Dropbox share
 report_status "Downloading sample data"
 if [ ! -d "$SCRIPT_DIR/workshop-data" ]; then
@@ -94,7 +103,7 @@ report_status " -- complete"
 
 # Install required Python libraries
 report_status "Installing Python libraries"
-pip3 install -q argparse elasticsearch tqdm
+$SCRIPT_DIR/venv/bin/pip3 install -q argparse elasticsearch tqdm
 report_status " -- complete"
 
 # Upload CSV data to Elasticsearch
