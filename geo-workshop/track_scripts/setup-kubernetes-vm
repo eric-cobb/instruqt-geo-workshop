@@ -32,31 +32,39 @@ retry_command() {
     return $exit_code
 }
 
-echo "Waiting for Instruqt host bootstrap to finish"
+# Function to report status messages reducing duplication of echo commands
+report_status()
+{
+    echo ""
+    echo -e "$@"
+    echo ""
+}
+
+report_status "Waiting for Instruqt host bootstrap to finish"
 # Wait for the Instruqt host bootstrap to finish
 retry_command test -f /opt/instruqt/bootstrap/host-bootstrap-completed 
-echo ""
+report_status "Instruqt host bootstrap finished"
 
-echo "Waiting for ks8 API server to become available"
+report_status "Waiting for ks8 API server to become available"
 # Wait for the Kubernetes API server to become available
 retry_command curl --silent --show-error --fail --output /dev/null http://localhost:8001/api 
-echo ""
+report_status "K8s API server is available"
 
 # Enable bash completion for kubectl
 echo "source /usr/share/bash-completion/bash_completion" >> /root/.bashrc
 echo "complete -F __start_kubectl k" >> /root/.bashrc
 
-echo "Install package updates, gginx, python3, and pip3"
-echo ""
+report_status "Install package updates, nginx, python3, and pip3"
 # Update apt packages and install ngix, python3 and pip3
 { apt-get update; apt-get -q install nginx python3 python3-pip -y; } &
+report_status "Package updates started in the background"
 
-echo "Installing ECK CRD and Operator"
+report_status "Installing ECK CRD and Operator"
 kubectl create -f https://download.elastic.co/downloads/eck/2.15.0/crds.yaml
 kubectl apply -f https://download.elastic.co/downloads/eck/2.15.0/operator.yaml
-echo ""
+report_status "ECK CRD and Operator installed"
 
-echo "Creating Elastic cluster in k8s"
+report_status "Creating Elastic cluster in k8s"
 cat <<EOF | kubectl apply -f -
 apiVersion: kibana.k8s.elastic.co/v1
 kind: Kibana
@@ -138,23 +146,24 @@ spec:
   type: NodePort
 EOF
 
-echo "Done creating Elastic cluster in k8s"
-echo ""
+report_status "Done creating Elastic cluster in k8s"
 
 # Wait until Elasticsearch pods to be created and ready
-echo 'Waiting for Elasticsearch pods to be created'
+report_status 'Waiting for Elasticsearch pods to be created'
 retry_command kubectl get pods -n default | grep -q elasticsearch 
-echo ""
+report_status 'Elasticsearch pods ready'
 
-echo 'Waiting for all pods to be ready'
+report_status 'Waiting for all pods to be ready'
 retry_command kubectl wait pod -n default -l common.k8s.elastic.co/type --for=condition=Ready --timeout=30s
-echo ""
+report_status 'All pods ready'
 
-echo 'Waiting for Kibana'
+report-status 'Waiting for Kibana'
 retry_command kubectl get pods -n default | grep -q kibana 
-echo 'Waiting for all pods to be ready'
+report_status 'Kibana ready'
+
+report_status 'Waiting for all pods to be ready'
 retry_command kubectl wait pod -n default -l common.k8s.elastic.co/type --for=condition=Ready --timeout=60s
-echo ""
+report_status 'All pods ready'
 
 # Store settings in .env file
 echo 'ELASTICSEARCH_USERNAME=elastic' >> /root/.env
@@ -181,7 +190,7 @@ KIBANA_URL_WITHOUT_PROTOCOL=$(echo $KIBANA_URL | sed -e 's#http[s]\?://##g')
 
 ulimit -n 16384
 
-echo "Setting up Nginx configuration"
+report_status "Setting up Nginx configuration"
 echo '
 upstream keepalive-upstream {
   server '${KIBANA_URL_WITHOUT_PROTOCOL}';
@@ -231,10 +240,10 @@ server {
   }
 }
 ' > /etc/nginx/conf.d/default.conf
-echo ""
+report_status "Nginx configuration complete"
 
 # Enable trial license
-echo "Enabling trial license"
+report_status "Enabling trial license"
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: Secret
@@ -246,13 +255,13 @@ metadata:
   annotations:
     elastic.co/eula: accepted 
 EOF
-echo ""
+report_status "Trial license enabled"
 
 echo '127.0.0.1 elasticsearch-es-http.default.svc' >> /etc/hosts
 
 systemctl restart nginx
 
-echo "Setting up k8s ingress"
+report_status "Setting up k8s ingress"
 echo '
 ---
 
@@ -278,9 +287,9 @@ spec:
 ' > /root/ingress-apm.yaml
 
 envsubst < /root/ingress-apm.yaml | kubectl apply -f -
-echo ""
+report_status "K8s ingress setup complete"
 
-echo "Setting up k8s service for Kibana"
+report_status "Setting up k8s service for Kibana"
 echo '
 apiVersion: v1
 kind: Service
@@ -299,16 +308,16 @@ spec:
 ' > /root/kibana-lb.yaml
 
 kubectl apply -f /root/kibana-lb.yaml
-echo ""
+report_status "K8s service for Kibana setup complete"
 
-echo "Setting up Traefik"
+report_status "Setting up Traefik"
 kubectl apply -f https://raw.githubusercontent.com/traefik/traefik/v2.10/docs/content/reference/dynamic-configuration/kubernetes-crd-definition-v1.yml
-echo ""
+report_status "Traefik setup complete"
 
 
 export AUTH=$(echo -n "elastic:$(kubectl get secret elasticsearch-es-elastic-user -n default -o go-template='{{.data.elastic | base64decode}}')" | base64 -w0)
 
-echo "Setting up k8s middelware for Traefik"
+report_status "Setting up k8s middelware for Traefik"
 # middleware that sets request and response header to dummy value
 echo '
 apiVersion: traefik.containo.us/v1alpha1
@@ -325,9 +334,9 @@ spec:
 ' > /root/middleware.yaml
 
 envsubst < /root/middleware.yaml | kubectl apply -f -
-echo ""
+report_status "K8s middleware setup complete"
 
-echo "Setting up k8s ingress in Traefix for Kibana"
+report_status "Setting up k8s ingress in Traefix for Kibana"
 # ingress route for kibana
 echo '
 apiVersion: traefik.containo.us/v1alpha1
@@ -349,64 +358,57 @@ spec:
 ' > /root/ingress-kibana.yaml
 
 envsubst < /root/ingress-kibana.yaml | kubectl apply -f -
-echo ""
+report_status "K8s ingress setup complete"
 
 # Download sample data from Dropbox share
-echo "Downloading sample data"
+report_status "Downloading sample data"
 mkdir elastic-geospatial-workshop
 cd elastic-geospatial-workshop
 retry_command wget -q -r "https://www.dropbox.com/scl/fo/5klueqzd01rsuoh9l84ui/AKabsZrOfsnsjHwDdXuQ8Xc?rlkey=0sndaf9qk0ykgtq8l4qasnjst&st=jd5q74pz&dl=1" -O files.zip
 unzip files.zip 
-echo "Download sample data complete"
-echo ""
+report_status "Download sample data complete"
 
 # Upload Elasticsearch Trimet index template
-echo "Uploading Elasticsearch index template for sample data"
+report_status "Uploading Elasticsearch index template for sample data"
 retry_command curl --silent --show-error --fail -X PUT "$ELASTICSEARCH_URL/_index_template/trimet-geo-workshop-template" \
 -H "Content-Type: application/json" \
 -H "Authorization: Basic $BASE64" \
 -d @trimet-geo-workshop-index-template.json
-echo "Upload Elasticsearch index template complete"
-echo ""
+report_status "Upload Elasticsearch index template complete"
 
 # Upload Elasticsearch Portland GeoJSON index template
-echo "Uploading Elasticsearch index template for Portland GeoJSON data"
+report_status "Uploading Elasticsearch index template for Portland GeoJSON data"
 retry_command curl --silent --show-error --fail -X PUT "$ELASTICSEARCH_URL/_index_template/portland-geojson-template" \
 -H "Content-Type: application/json" \
 -H "Authorization: Basic $BASE64" \
 -d @portland-geojson-index-template.json
-echo "Upload Elasticsearch index template complete"
-echo ""
+report_status "Upload Elasticsearch index template complete"
 
 # Install required Python libraries
-echo "Installing Python libraries"
+report_status "Installing Python libraries"
 pip install -q argparse elasticsearch tqdm
-echo "Installation Python libraries complete"
-echo ""
+report_status "Installation Python libraries complete"
 
 # Upload CSV data to Elasticsearch
-echo "Uploading Trimet CSV data to Elasticsearch"
+report_status "Uploading Trimet CSV data to Elasticsearch"
 python3 upload-csv-elasticsearch.py --csv trimet-geo-workshop-data.csv --host $ELASTICSEARCH_URL --password $ELASTICSEARCH_PASSWORD
-echo ""
+report_status "Upload Trimet CSV data complete"
 
 # Upload GeoJSON data to Elasticsearch
-echo "Uploading GeoJSON data to Elasticsearch"
+report_status "Uploading GeoJSON data to Elasticsearch"
 python3 upload-geojson-elasticsearch.py --json portland-geojson.json --host $ELASTICSEARCH_URL --password $ELASTICSEARCH_PASSWORD
-echo ""
+report_status "Upload GeoJSON data complete"
 
 # Upload Trimet dataview to Kibana"
-echo "Uploading Trimet dataview to Kibana"
+report_status "Uploading Trimet dataview to Kibana"
 curl \
  -X POST $KIBANA_URL/api/data_views/data_view \
  -H "Authorization: Basic $BASE64" \
  -H "Content-Type: application/json; Elastic-Api-Version=2023-10-31" \
  -H "kbn-xsrf: string" \
  -d @trimet-geo-workshop-dataview.json
-echo "Upload Kibana dataview complete"
-echo ""
+report_status "Upload Kibana dataview complete"
 
-echo "Upload complete"
-echo ""
+report_status "Data upload complete"
 
-echo "Bootstrap script completed successfully!"
-echo ""
+report_status "Bootstrap script completed successfully!"
