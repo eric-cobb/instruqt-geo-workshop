@@ -72,7 +72,7 @@ if [ ! -d "$SCRIPT_DIR/.venv" ]; then
     python3 -m venv $SCRIPT_DIR/.venv
     report_status " -- complete"
 fi
-report-status "Python .venv exists"
+report_status "Python .venv exists"
 
 # Download sample data from Dropbox share
 report_status "Downloading sample data"
