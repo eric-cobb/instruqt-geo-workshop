@@ -73,7 +73,7 @@ fi
 
 cd  $SCRIPT_DIR/workshop-data
 retry_command wget -q -r "https://www.dropbox.com/scl/fo/5klueqzd01rsuoh9l84ui/AKabsZrOfsnsjHwDdXuQ8Xc?rlkey=0sndaf9qk0ykgtq8l4qasnjst&st=ub7url9i&dl=1" -O files.zip
-unzip files.zip -o -x /
+unzip -o files.zip -x /
 report_status " -- complete"
 
 # Upload Elasticsearch Trimet index template
