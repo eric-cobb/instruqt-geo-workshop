@@ -6,7 +6,7 @@ cd ${SCRIPT_DIR}
 
 # Function to retry a command with exponential backoff
 retry_command() {
-    local max_attempts=8
+    local max_attempts=10
     local timeout=1
     local attempt=1
     local exit_code=0
@@ -66,21 +66,23 @@ report_status " -- complete"
 BASE64=$(echo -n "elastic:${ES_LOCAL_PASSWORD}" | base64)
 
 # Check of Python .venv
-report_status "Checking for Python .venv"
-if [ ! -d "$SCRIPT_DIR/.venv" ]; then
-    report_status " Python .venv does not exist, creating"
-    python3 -m venv $SCRIPT_DIR/.venv
+PYTHON_ENV="$SCRIPT_DIR/.venv"
+report_status "Checking for Python $PYTHON_ENV"
+if [ ! -d "$PYTHON_ENV" ]; then
+    report_status " Python $PYTHON_ENV does not exist, creating"
+    python3 -m venv $PYTHON_ENV 
     report_status " -- complete"
 fi
-report_status "Python .venv exists"
+report_status "Python $PYTHON_ENV exists"
 
 # Download sample data from Dropbox share
+WORKSHOP_DATA_DIR="$SCRIPT_DIR/workshop-data"
 report_status "Downloading sample data"
-if [ ! -d "$SCRIPT_DIR/workshop-data" ]; then
-    mkdir $SCRIPT_DIR/workshop-data
+if [ ! -d "$WORKSHOP_DATA_DIR" ]; then
+    mkdir $WORKSHOP_DATA_DIR
 fi
 
-cd  $SCRIPT_DIR/workshop-data
+cd  $WORKSHOP_DATA_DIR
 retry_command wget -q -r "https://www.dropbox.com/scl/fo/5klueqzd01rsuoh9l84ui/AKabsZrOfsnsjHwDdXuQ8Xc?rlkey=0sndaf9qk0ykgtq8l4qasnjst&st=ub7url9i&dl=1" -O files.zip
 unzip -o files.zip -x /
 report_status " -- complete"
@@ -101,19 +103,22 @@ retry_command curl --silent --show-error --fail -X PUT "$ES_LOCAL_URL/_index_tem
 -d @portland-geojson-index-template.json
 report_status " -- complete"
 
+PYTHON3=$PYTHON_ENV/bin/python3
+PIP3=$PYTHON_ENV/bin/pip3
+
 # Install required Python libraries
 report_status "Installing Python libraries"
-$SCRIPT_DIR/.venv/bin/pip3 install -q argparse elasticsearch tqdm
+$PIP3 install -q argparse elasticsearch tqdm
 report_status " -- complete"
 
 # Upload CSV data to Elasticsearch
 report_status "Uploading Trimet CSV data to Elasticsearch"
-$SCRIPT_DIR/.venv/python3 upload-csv-elasticsearch.py --csv trimet-geo-workshop-data.csv --host $ES_LOCAL_URL --password $ES_LOCAL_PASSWORD
+$PYTHON3 upload-csv-elasticsearch.py --csv trimet-geo-workshop-data.csv --host $ES_LOCAL_URL --password $ES_LOCAL_PASSWORD
 report_status " -- complete"
 
 # Upload GeoJSON data to Elasticsearch
 report_status "Uploading GeoJSON data to Elasticsearch"
-$SCRIPT_DIR/.venv/python3 upload-geojson-elasticsearch.py --json portland-geojson.json --host $ES_LOCAL_URL --password $ES_LOCAL_PASSWORD
+$PYTHON3 upload-geojson-elasticsearch.py --json portland-geojson.json --host $ES_LOCAL_URL --password $ES_LOCAL_PASSWORD
 report_status " -- complete"
 
 # Upload Trimet dataview to Kibana"
