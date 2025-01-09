@@ -1,0 +1,8 @@
+{
+  "data_view": {
+    "id": "trimet-geo-workshop-data",
+    "name": "trimet-geo-workshop-data",
+    "title": "trimet-geo-workshop-data*",
+    "timeFieldName": "@timestamp"
+  }
+}

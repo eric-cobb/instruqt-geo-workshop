@@ -1,0 +1,262 @@
+{
+  "index_patterns": ["trimet-geo-workshop-data*"],
+  "priority": 1,
+  "template": {
+    "settings": {
+      "index": {
+        "sort.field": "trimet.vehicleID.keyword",
+        "sort.order": "asc"
+      }
+    },
+    "mappings": {
+      "properties": {
+        "@timestamp": {
+          "type": "date",
+          "index": "true",
+          "ignore_malformed": "false",
+          "doc_values": "true",
+          "store": "false",
+          "format": "date_optional_time"
+        },
+        "trimet": {
+          "type": "object",
+          "properties": {
+            "bearing": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "blockID": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "delay": {
+              "type": "integer",
+              "index": "true",
+              "ignore_malformed": "true",
+              "coerce": "true",
+              "doc_values": "true",
+              "store": "false"
+            },
+            "direction": {
+              "type": "integer",
+              "index": "true",
+              "ignore_malformed": "true",
+              "coerce": "true",
+              "doc_values": "true",
+              "store": "false"
+            },
+            "expires": {
+              "type": "date",
+              "index": "true",
+              "ignore_malformed": "false",
+              "doc_values": "true",
+              "store": "false",
+              "format": "date_optional_time"
+            },
+            "garage": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "inCongestion": {
+              "type": "boolean",
+              "index": "true",
+              "doc_values": "true",
+              "store": "false"
+            },
+            "lastLocID": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "lastStopSeq": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "loadPercentage": {
+              "type": "integer",
+              "index": "true",
+              "ignore_malformed": "true",
+              "coerce": "true",
+              "doc_values": "true",
+              "store": "false"
+            },
+            "location": {
+              "type": "geo_point",
+              "ignore_malformed": "true",
+              "ignore_z_value": "true"
+            },
+            "locationInScheduleDay": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "messageCode": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "newTrip": {
+              "type": "boolean",
+              "index": "true",
+              "doc_values": "true",
+              "store": "false"
+            },
+            "nextLocID": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "nextStopSeq": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "offRoute": {
+              "type": "boolean",
+              "index": "true",
+              "doc_values": "true",
+              "store": "false"
+            },
+            "routeColor": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "routeNumber": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "routeSubType": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "serviceDate": {
+              "type": "date",
+              "index": "true",
+              "ignore_malformed": "false",
+              "doc_values": "true",
+              "store": "false",
+              "format": "date_optional_time"
+            },
+            "signMessage": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "signMessageLong": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "source": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "time": {
+              "type": "date",
+              "index": "true",
+              "ignore_malformed": "false",
+              "doc_values": "true",
+              "store": "false",
+              "format": "date_optional_time"
+            },
+            "tripID": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "type": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            },
+            "vehicleID": {
+              "type": "text",
+              "fields": {
+                "keyword": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

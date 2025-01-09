@@ -1,0 +1,40 @@
+{
+  "index_patterns": ["portland-geojson*"],
+  "priority": 1,
+  "template": {
+  "mappings": {
+    "properties": {
+      "cartodb_id": {
+        "type": "long"
+      },
+      "created_at": {
+        "type": "date"
+      },
+      "geometry": {
+        "type": "geo_shape"
+      },
+      "name": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "state": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "updated_at": {
+        "type": "date"
+      }
+    }
+  }
+}
+}

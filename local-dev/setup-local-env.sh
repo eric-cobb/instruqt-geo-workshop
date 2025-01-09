@@ -75,18 +75,12 @@ if [ ! -d "$PYTHON_ENV" ]; then
 fi
 report_status "Python $PYTHON_ENV exists"
 
-# Download sample data from Github repo
-WORKSHOP_DATA_DIR="$SCRIPT_DIR/workshop-data"
-report_status " sample data"
-if [ ! -d "$WORKSHOP_DATA_DIR" ]; then
-    mkdir $WORKSHOP_DATA_DIR
-fi
-
-cd  $WORKSHOP_DATA_DIR
-#retry_command wget -q -r "https://www.dropbox.com/scl/fo/5klueqzd01rsuoh9l84ui/AKabsZrOfsnsjHwDdXuQ8Xc?rlkey=0sndaf9qk0ykgtq8l4qasnjst&st=ub7url9i&dl=1" -O files.zip
-retry_command wget  -r "https://raw.githubusercontent.com/eric-cobb/instruqt-geo-workshop/main/geo-workshop/workshop-data/workshop-data.zip" -O files.zip
-unzip -o files.zip -x /
+# Clone the workshop git repo which contains the sample data.
+report_status "Downloading workshop git repo"
+DATA_DIR="$SCRIPT_DIR/instruqt-geo-workshop/workshop-data"
 report_status " -- complete"
+
+cd $DATA_DIR
 
 # Upload Elasticsearch Trimet index template
 report_status "Uploading Elasticsearch index template for sample data"
