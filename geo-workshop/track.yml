@@ -72,8 +72,8 @@ instructors:
 - scott.karter@elastic.co
 - ryan.chen@elastic.co
 - siddharth.dwivedi@elastic.co
-- lasse.byrnak@elastic.co
 - richard.im@elastic.co
+- lasse.byrnak@elastic.co
 maintenance: true
 show_timer: true
 idle_timeout: 3600
