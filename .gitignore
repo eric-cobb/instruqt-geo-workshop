@@ -1,18 +1,17 @@
-# Don't checkin the git report created by local setup script.
+# Don't track Elastic Start-Local
+local-dev/elastic-start-local/
+
+# Don't track the local git copy pulled via the local setup script.
 local-dev/instruqt-geo-workshop/
 
-# Don't checkin Elastic Start-Local
-elastic-start-local/
+# Don't track the local data files pulled via the local setup script.
 
-# Don't checkin the data files as they are pulled from Dropbox (for now)
-local-dev/workshop-data/
-
-# Don't checkin env files
+# Don't track env files
 .env
 
-# Don't checkin the Python virtual environment
+# Don't track the Python virtual environment
 venv
 .venv
 
-# Don't checkin log files.
+# Don't track log files.
 *.log
