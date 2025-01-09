@@ -1,3 +1,6 @@
+# Don't checkin the git report created by local setup script.
+local-dev/instruqt-geo-workshop/
+
 # Don't checkin Elastic Start-Local
 elastic-start-local/
 
