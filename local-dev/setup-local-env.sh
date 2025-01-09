@@ -44,7 +44,7 @@ report_status()
 
 # Download Elastic Start-Local Script
 report_status "Downloading Elastic Start-Local Script"
-curl -fsSL https://elastic.co/start-local | sh
+#curl -fsSL https://elastic.co/start-local | sh
 report_status " -- complete"
 
 # Verify environment file exists
@@ -77,6 +77,7 @@ report_status "Python $PYTHON_ENV exists"
 
 # Clone the workshop git repo which contains the sample data.
 report_status "Downloading workshop git repo"
+retry_command git clone https://github.com/eric-cobb/instruqt-geo-workshop.git
 DATA_DIR="$SCRIPT_DIR/instruqt-geo-workshop/workshop-data"
 report_status " -- complete"
 
