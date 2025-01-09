@@ -1,8 +1,64 @@
-#!/bin/bash 
+#!/bin/bash
 set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-cd ${SCRIPT_DIR}
+cd "${SCRIPT_DIR}"
+
+# -----------------------------------------------------------------------------
+# Check for cleanup mode
+# -----------------------------------------------------------------------------
+if [ $# -eq 2 ]; then
+    if [ "$1" = "cleanup" ]; then
+        case "$2" in
+            elastic-start-local)
+                # Run uninstall script if it exists
+                if [ -f "elastic-start-local/uninstall.sh" ]; then
+                    echo "Running uninstall script for elastic-start-local..."
+                    bash "elastic-start-local/uninstall.sh"
+                fi
+
+                # Remove elastic-start-local directory
+                echo "Removing elastic-start-local directory..."
+                rm -rf "elastic-start-local"
+                echo "Cleanup of elastic-start-local complete."
+                ;;
+
+            instruqt-geo-workshop)
+                # Remove instruqt-geo-workshop directory
+                echo "Removing instruqt-geo-workshop directory..."
+                rm -rf "instruqt-geo-workshop"
+                echo "Cleanup of instruqt-geo-workshop complete."
+                ;;
+            all)
+                # Run uninstall script if it exists
+                if [ -f "elastic-start-local/uninstall.sh" ]; then
+                    echo "Running uninstall script for elastic-start-local..."
+                    bash "elastic-start-local/uninstall.sh"
+                fi
+
+                # Remove elastic-start-local directory
+                echo "Removing elastic-start-local directory..."
+                rm -rf "elastic-start-local"
+                echo "Cleanup of elastic-start-local complete."
+
+                # Remove instruqt-geo-workshop directory
+                echo "Removing instruqt-geo-workshop directory..."
+                rm -rf "instruqt-geo-workshop"
+                echo "Cleanup of instruqt-geo-workshop complete."
+                ;;
+
+            *)
+                echo "Error: Unknown second parameter '$2'."
+                echo "Usage: $0 cleanup [elastic-start-local | instruqt-geo-workshop | all]"
+                exit 1
+                ;;
+        esac
+    fi
+fi
+
+# -----------------------------------------------------------------------------
+# If not running in cleanup mode, proceed with normal script logic
+# -----------------------------------------------------------------------------
 
 # Function to retry a command with exponential backoff
 retry_command() {
@@ -41,10 +97,9 @@ report_status()
     echo ""
 }
 
-
 # Download Elastic Start-Local Script
 report_status "Downloading Elastic Start-Local Script"
-#curl -fsSL https://elastic.co/start-local | sh
+curl -fsSL https://elastic.co/start-local | sh
 report_status " -- complete"
 
 # Verify environment file exists
@@ -65,12 +120,12 @@ report_status " -- complete"
 # BASE64 username and password for use with curl basic auth
 BASE64=$(echo -n "elastic:${ES_LOCAL_PASSWORD}" | base64)
 
-# Check of Python .venv
+# Check Python .venv
 PYTHON_ENV="$SCRIPT_DIR/.venv"
 report_status "Checking for Python $PYTHON_ENV"
 if [ ! -d "$PYTHON_ENV" ]; then
     report_status " Python $PYTHON_ENV does not exist, creating"
-    python3 -m venv $PYTHON_ENV 
+    python3 -m venv "$PYTHON_ENV"
     report_status " -- complete"
 fi
 report_status "Python $PYTHON_ENV exists"
@@ -81,7 +136,7 @@ retry_command git clone https://github.com/eric-cobb/instruqt-geo-workshop.git
 DATA_DIR="$SCRIPT_DIR/instruqt-geo-workshop/workshop-data"
 report_status " -- complete"
 
-cd $DATA_DIR
+cd "$DATA_DIR"
 
 # Upload Elasticsearch Trimet index template
 report_status "Uploading Elasticsearch index template for sample data"
@@ -99,25 +154,25 @@ retry_command curl --silent --show-error --fail -X PUT "$ES_LOCAL_URL/_index_tem
 -d @portland-geojson-index-template.json
 report_status " -- complete"
 
-PYTHON3=$PYTHON_ENV/bin/python3
-PIP3=$PYTHON_ENV/bin/pip3
+PYTHON3="$PYTHON_ENV/bin/python3"
+PIP3="$PYTHON_ENV/bin/pip3"
 
 # Install required Python libraries
 report_status "Installing Python libraries"
-$PIP3 install -q argparse elasticsearch tqdm pip --upgrade
+"$PIP3" install -q argparse elasticsearch tqdm pip --upgrade
 report_status " -- complete"
 
 # Upload CSV data to Elasticsearch
 report_status "Uploading Trimet CSV data to Elasticsearch"
-$PYTHON3 upload-csv-elasticsearch.py --csv trimet-geo-workshop-data.csv --host $ES_LOCAL_URL --password $ES_LOCAL_PASSWORD
+"$PYTHON3" upload-csv-elasticsearch.py --csv trimet-geo-workshop-data.csv --host "$ES_LOCAL_URL" --password "$ES_LOCAL_PASSWORD"
 report_status " -- complete"
 
 # Upload GeoJSON data to Elasticsearch
 report_status "Uploading GeoJSON data to Elasticsearch"
-$PYTHON3 upload-geojson-elasticsearch.py --json portland-geojson.json --host $ES_LOCAL_URL --password $ES_LOCAL_PASSWORD
+"$PYTHON3" upload-geojson-elasticsearch.py --json portland-geojson.json --host "$ES_LOCAL_URL" --password "$ES_LOCAL_PASSWORD"
 report_status " -- complete"
 
-# Upload Trimet dataview to Kibana"
+# Upload Trimet dataview to Kibana
 report_status "Uploading Trimet dataview to Kibana"
 curl \
  -X POST http://localhost:5601/api/data_views/data_view \
