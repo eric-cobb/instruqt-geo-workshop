@@ -84,7 +84,7 @@ fi
 
 cd  $WORKSHOP_DATA_DIR
 #retry_command wget -q -r "https://www.dropbox.com/scl/fo/5klueqzd01rsuoh9l84ui/AKabsZrOfsnsjHwDdXuQ8Xc?rlkey=0sndaf9qk0ykgtq8l4qasnjst&st=ub7url9i&dl=1" -O files.zip
-retry_command wget -q -r "https://github.com/eric-cobb/instruqt-geo-workshop/blob/main/geo-workshop/workshop-data/workshop-data.zip" -O files.zip
+retry_command wget  -r "https://raw.githubusercontent.com/eric-cobb/instruqt-geo-workshop/main/geo-workshop/workshop-data/workshop-data.zip" -O files.zip
 unzip -o files.zip -x /
 report_status " -- complete"
 
