@@ -2,7 +2,7 @@
 elastic-start-local/
 
 # Don't checkin the data files as they are pulled from Dropbox (for now)
-workshop-data/
+local-dev/workshop-data/
 
 # Don't checkin env files
 .env
