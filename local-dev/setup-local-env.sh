@@ -203,11 +203,11 @@ report_status " -- complete"
 
 # Upload CSV data to Elasticsearch
 report_status "Uploading Trimet CSV data to Elasticsearch"
-report_status "Simulating 10 days of data"
-for days in {1..3}; do
+report_status "Simulating 3 days of data"
+for days in {0..2}; do
     #for file in data-files/*.csv; do
     # Using the 4 largest files for the workshop ~10K records for 1 day of data.
-    for file in data-files/35-greeley-to-univ-portland.csv data-files/35-to-oregon-city-tc.csv data-files/33-to-clackamas-college.csv data-files/33-to-clackamas-town-center.csv
+    for file in data-files/35-greeley-to-univ-portland.csv data-files/35-to-oregon-city-tc.csv data-files/33-to-clackamas-college.csv data-files/33-to-clackamas-town-center.csv; do
         "$PYTHON" upload-csv-elasticsearch.py --csv $file --host "$ES_LOCAL_URL" --username elastic --password "$ES_LOCAL_PASSWORD" --index trimet-geo-workshop-data  --filter "<DATE>" --days $days 
     done
 done
