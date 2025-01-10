@@ -168,8 +168,6 @@ def upload_csv_to_elasticsearch(csv_file_path, es_host, es_user, es_pass, es_ind
         # Check if the index exists and create if it does not exist
         if not es.indices.exists(index=es_index):
             es.indices.create(index=es_index)
-        else:
-            es.indices.delete(index=es_index)
 
         # Progress bar setup
         total_docs = sum(1 for _ in open(csv_file_path)) - 1  # Adjust for header row
