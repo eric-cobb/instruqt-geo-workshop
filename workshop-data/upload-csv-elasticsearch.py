@@ -49,18 +49,17 @@ from elasticsearch import Elasticsearch
 from elasticsearch.helpers import streaming_bulk
 from typing import Optional
 
-es_index = "trimet-geo-workshop-data"
-es_user = "elastic"
-
 
 def parse_arguments():
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(description="Uploads a CSV file to Elasticsearch.")
     parser.add_argument("--csv", required=True, help="Path to the CSV file.")
     parser.add_argument("--host", required=True, help="Elasticsearch host URL.")
-    parser.add_argument(
-        "--password", required=True, help="Elasticsearch password for the elastic user."
-    )
+    parser.add_argument("--username", required=True, help="Elasticsearch username for the elastic user.")
+    parser.add_argument("--password", required=True, help="Elasticsearch password for the elastic user.")
+    parser.add_argument("--index", required=True, help="Elasticsearch index name where data will be stored.")
+    parser.add_argument("--filter", required=False, default=None, help="The filter string to use for date simulation.")
+    parser.add_argument("--days", required=False, type=int, default=1, help="The number of days to use for date simulation.")
 
     return parser.parse_args()
 
@@ -71,16 +70,13 @@ def validate_arguments(args):
         print(f"Error: The file '{args.csv}' does not exist.")
         sys.exit(1)
 
-def get_day_minus_utc(date: str, current_utc, days_map: dict) -> Optional[datetime]:
-    """Map the date string to the number of days ago and return the new date."""
-    for prefix, days_ago in days_map.items():
-        if date.startswith(prefix):
-            return current_utc - timedelta(days=days_ago)
-    # If none matches, return None or raise an error
-    return None
+def update_date(date: str, days: int) -> str:
+    """Convert a placeholder date string in the format of '<DATE> @ 00:00:00.000' to a date string of today minus number days
 
-def update_date(date) -> str:
-    """Convert a placeholder date string in the format of <DAY ONE:NINE> to a date string of today minus day <ONE:NINE>."""
+    Args:
+        date (str): The date string to replace.
+        days (int): The number of days to subtract from the current date.
+    """
     # Define the temporary date format
     date_format = "%Y-%m-%d"
 
@@ -90,50 +86,48 @@ def update_date(date) -> str:
     # Get the current date and time in UTC
     current_utc = datetime.now(timezone.utc)
 
-    days_map = {
-        "<DAY ONE>": 1,
-        "<DAY TWO>": 2,
-        "<DAY THREE>": 3,
-        "<DAY FOUR>": 4,
-        "<DAY FIVE>": 5,
-        "<DAY SIX>": 6,
-        "<DAY SEVEN>": 7,
-        "<DAY EIGHT>": 8,
-        "<DAY NINE>": 9
-    }
-
-    day_minus_utc = get_day_minus_utc(date, current_utc, days_map)
-
-    if day_minus_utc is not None:
-        # Convert the UTC datetime object to string format
-        date_minus_utc = day_minus_utc.strftime(date_format)
-
-        datetime_utc_str = date_minus_utc + "T" + clean_time + "Z"
-
-        return datetime_utc_str
+    # Subtract the number of days from the current date
+    if days is not None or days > 0:
+        day_minus_utc = current_utc - timedelta(days=days) 
     else:
-        return ""
+        day_minus_utc = current_utc
+
+    # Convert the UTC datetime object to string format
+    date_minus_utc = day_minus_utc.strftime(date_format)
+
+    datetime_utc_str = date_minus_utc + "T" + clean_time + "Z"
+
+    return datetime_utc_str
 
 
-def generate_actions(csv_file_path, es_index):
+def generate_actions(csv_file_path, es_index, filter: Optional[str] = None, days: Optional[int] = 0):
     """
     A generator function to yield Elasticsearch actions from a CSV file.
-    Replaces specific date values while keeping the time for better data parsing.
+    Replaces date values using a string match,keeping the time for better data parsing.
 
     Args:
         csv_file_path (str): File path for csv data.
         es_index (str): Name of Elasticsearch index.
+        filter (str): Filter string to find date strings.
+        days (int): Number of days to subtract from current date.
     """
 
     with open(csv_file_path, mode="r", encoding="utf-8") as file:
         reader = csv.DictReader(file)
 
+        if filter:
+            print(f"Using filter '{filter}' to find the date strings.")
+        
+        if days:
+            print(f"Using {days} days for date simulation.")
+        else:
+            print("Using today's date for date simulation.")
+
         for row in reader:
             for key, value in row.items():
-                # We need to replace placeholder values <DAY ONE> with calculated dates.
-                date_keys = {"trimet.time", "trimet.expires", "trimet.serviceDate"}
-                if key in date_keys:
-                    row[key] = update_date(value)
+                # We need to replace placeholder values in keys matching filter with calculated dates.
+                if filter and filter in value:
+                    row[key] = update_date(value, days)
 
                 # We need to convert the string values to boolean values.
                 boolean_keys = {"trimet.inCongestion", "trimet.newTrip", "trimet.offRoute"}
@@ -156,14 +150,18 @@ def generate_actions(csv_file_path, es_index):
             yield {"_index": es_index, "_id": record_hash, "_source": row}
 
 
-def upload_csv_to_elasticsearch(csv_file_path, es_host, es_pass):
+def upload_csv_to_elasticsearch(csv_file_path, es_host, es_user, es_pass, es_index, filter: Optional[str] = None, days: Optional[int] = 0):
     """
     Upload CSV data to Elasticsearch using bulk API.
-
+    
     Args:
         csv_file_path (str): Path to the CSV file.
         es_host (str): Elasticsearch host URL.
-        es_pass (str): Password for Elasticsearch user.
+        es_user (str): Elasticsearch username.
+        es_pass (str): Elasticsearch password.
+        es_index (str): Name of Elasticsearch index where data will be stored.
+        filter (str): Filter string to find date strings.
+        days (int): Number of days to subtract from current date. 
     """
     try:
         # Connect to Elasticsearch
@@ -183,7 +181,7 @@ def upload_csv_to_elasticsearch(csv_file_path, es_host, es_pass):
         try:
             for ok, action in streaming_bulk(
                 client=es,
-                actions=generate_actions(csv_file_path, es_index),
+                actions=generate_actions(csv_file_path, es_index, filter, days),
                 raise_on_error=False,
                 raise_on_exception=False,
                 chunk_size=1000,
@@ -203,8 +201,13 @@ def upload_csv_to_elasticsearch(csv_file_path, es_host, es_pass):
 def main():
     args = parse_arguments()
     validate_arguments(args)
-    upload_csv_to_elasticsearch(args.csv, args.host, args.password)
+    upload_csv_to_elasticsearch(args.csv, args.host, args.username, args.password, args.index, args.filter, args.days)
 
 
 if __name__ == "__main__":
+    # Example Usage
+    #
+    #python3 upload-csv-elasticsearch.py --csv data-files/33-to-clackamas-town-center.csv --host http://localhost:9200 --username elastic --password password --index trimet-geo-workshop-data --filter "<DATE>" --days 1
+    #
+
     main()
