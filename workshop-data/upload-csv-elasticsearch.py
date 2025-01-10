@@ -23,7 +23,6 @@ Arguments:
 Dependencies:
     - csv
     - elasticsearch
-    - tqmd
     - hashlib
     - argparse
     - datetime
@@ -44,7 +43,6 @@ import sys
 from datetime import datetime, timedelta, timezone
 import json
 
-import tqdm
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import streaming_bulk
 from typing import Optional
@@ -175,7 +173,6 @@ def upload_csv_to_elasticsearch(csv_file_path, es_host, es_user, es_pass, es_ind
 
         # Progress bar setup
         total_docs = sum(1 for _ in open(csv_file_path)) - 1  # Adjust for header row
-        progress = tqdm.tqdm(unit="docs", total=total_docs)
 
         successes = 0
         try:
@@ -186,7 +183,6 @@ def upload_csv_to_elasticsearch(csv_file_path, es_host, es_user, es_pass, es_ind
                 raise_on_exception=False,
                 chunk_size=1000,
             ):
-                progress.update(1)
                 successes += ok
 
                 if not ok:

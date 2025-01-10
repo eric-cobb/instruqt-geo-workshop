@@ -97,7 +97,7 @@ echo "Using Pip - Version: $PIP, PATH: $(command -v $PIP)"
 # Install required Python libraries
 # -----------------------------------------------------------------------------
 report_status "Installing Python libraries"
-"$PIP" install -q argparse elasticsearch tqdm pip --upgrade
+"$PIP" install -q argparse elasticsearch pip --upgrade
 report_status " -- complete"
 
 # -----------------------------------------------------------------------------
