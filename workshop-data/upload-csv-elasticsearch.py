@@ -187,7 +187,7 @@ def upload_csv_to_elasticsearch(csv_file_path, es_host, es_user, es_pass, es_ind
 
                 if not ok:
                     print(action)
-            print(f"Indexed {successes}/{total_docs} documents successfully.")
+            print(f"Input File: {csv_file_path}, Indexed {successes}/{total_docs} documents successfully.")
         except Exception as e:
             print(f"An unexpected error occurred: {e}")
     except Exception as e:
