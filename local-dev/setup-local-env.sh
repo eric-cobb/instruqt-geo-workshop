@@ -51,13 +51,13 @@ report_status()
 # Check Python virtual environment exists, create if it does not
 # -----------------------------------------------------------------------------
 PYTHON_ENV="$SCRIPT_DIR/.venv"
-report_status "Checking for Python $PYTHON_ENV"
+report_status "Checking for Python Virtual Environment"
 if [ ! -d "$PYTHON_ENV" ]; then
-    report_status " Python $PYTHON_ENV does not exist, creating"
+    report_status " Python Virtual Environment does not exist, creating"
     python3 -m venv "$PYTHON_ENV"
     report_status " -- complete"
 fi
-report_status "Python $PYTHON_ENV exists"
+report_status "Python VENV: $PYTHON_ENV"
 
 
 # -----------------------------------------------------------------------------
