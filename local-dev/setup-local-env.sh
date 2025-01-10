@@ -206,6 +206,7 @@ report_status "Uploading Trimet CSV data to Elasticsearch"
 for file in data-files/*.csv
 do
   "$PYTHON" upload-csv-elasticsearch.py --csv $file --host "$ES_LOCAL_URL" --password "$ES_LOCAL_PASSWORD" --index trimet-geo-workshop-data  --filter "<DATE>" --days 1
+done
 report_status " -- complete"
 
 # Upload GeoJSON data to Elasticsearch
