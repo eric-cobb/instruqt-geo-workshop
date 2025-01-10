@@ -31,8 +31,8 @@ brew install wget unzip
 ### `python3` and `pip3`
 
 The sample workshop data is loaded into Elasticsearch with a Python script. Your environment should have acccess to `python3`
-and `pip3` commands. If you need to install Python, we recommend [uv](https://github.com/astral-sh/uv) for installing/managing
-python versions, your python virtual environments, and your python requirements.
+and `pip3` commands version 3.9 or newer. If you need to install Python, we recommend [uv](https://github.com/astral-sh/uv)
+for installing/managing python versions, your python virtual environments, and your python requirements.
 
 ## Set Up Local Development Environment
 
