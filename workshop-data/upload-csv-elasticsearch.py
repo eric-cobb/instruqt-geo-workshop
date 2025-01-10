@@ -28,6 +28,7 @@ Dependencies:
     - argparse
     - datetime
     - pytz
+    - json
 
 Example:
     python upload_csv_elasticsearch.py --csv data.csv --host http://localhost:9200 --password password
@@ -38,12 +39,15 @@ import argparse
 import csv
 import hashlib
 import os
+from re import I
 import sys
 from datetime import datetime, timedelta, timezone
+import json
 
 import tqdm
 from elasticsearch import Elasticsearch
 from elasticsearch.helpers import streaming_bulk
+from typing import Optional
 
 es_index = "trimet-geo-workshop-data"
 es_user = "elastic"
@@ -67,20 +71,16 @@ def validate_arguments(args):
         print(f"Error: The file '{args.csv}' does not exist.")
         sys.exit(1)
 
+def get_day_minus_utc(date: str, current_utc, days_map: dict) -> Optional[datetime]:
+    """Map the date string to the number of days ago and return the new date."""
+    for prefix, days_ago in days_map.items():
+        if date.startswith(prefix):
+            return current_utc - timedelta(days=days_ago)
+    # If none matches, return None or raise an error
+    return None
 
-def update_date(date):
-    """
-    This function converts a placeholder date string in the format of <DAY ONE:NINE>
-    to a date string of today minus day <ONE:NINE>, etc. This makes it easier to find data
-    in Kibana without having to hard code date ranges, etc in workshops.
-
-    Args:
-        date (str): Date string in the format "<DAY ONE:NINE> @ %H:%M:%S.%f".
-
-    Returns:
-        str: Date string in the format %Y-%m-%dT%H:%M:%S.%fZ"
-    """
-
+def update_date(date) -> str:
+    """Convert a placeholder date string in the format of <DAY ONE:NINE> to a date string of today minus day <ONE:NINE>."""
     # Define the temporary date format
     date_format = "%Y-%m-%d"
 
@@ -89,33 +89,30 @@ def update_date(date):
 
     # Get the current date and time in UTC
     current_utc = datetime.now(timezone.utc)
-    day_minus_utc = current_utc
 
-    if date.startswith("<DAY ONE>"):
-        day_minus_utc = current_utc - timedelta(days=1)
-    elif date.startswith("<DAY TWO>"):
-        day_minus_utc = current_utc - timedelta(days=2)
-    elif date.startswith("<DAY THREE>"):
-        day_minus_utc = current_utc - timedelta(days=3)
-    elif date.startswith("<DAY FOUR>"):
-        day_minus_utc = current_utc - timedelta(days=4)
-    elif date.startswith("<DAY FIVE>"):
-        day_minus_utc = current_utc - timedelta(days=5)
-    elif date.startswith("<DAY SIX>"):
-        day_minus_utc = current_utc - timedelta(days=6)
-    elif date.startswith("<DAY SEVEN>"):
-        day_minus_utc = current_utc - timedelta(days=7)
-    elif date.startswith("<DAY EIGHT>"):
-        day_minus_utc = current_utc - timedelta(days=8)
-    elif date.startswith("<DAY NINE>"):
-        day_minus_utc = current_utc - timedelta(days=9)
+    days_map = {
+        "<DAY ONE>": 1,
+        "<DAY TWO>": 2,
+        "<DAY THREE>": 3,
+        "<DAY FOUR>": 4,
+        "<DAY FIVE>": 5,
+        "<DAY SIX>": 6,
+        "<DAY SEVEN>": 7,
+        "<DAY EIGHT>": 8,
+        "<DAY NINE>": 9
+    }
 
-    # Convert the UTC datetime object to string format
-    date_minus_utc = day_minus_utc.strftime(date_format)
+    day_minus_utc = get_day_minus_utc(date, current_utc, days_map)
 
-    datetime_utc_str = date_minus_utc + "T" + clean_time + "Z"
+    if day_minus_utc is not None:
+        # Convert the UTC datetime object to string format
+        date_minus_utc = day_minus_utc.strftime(date_format)
 
-    return datetime_utc_str
+        datetime_utc_str = date_minus_utc + "T" + clean_time + "Z"
+
+        return datetime_utc_str
+    else:
+        return ""
 
 
 def generate_actions(csv_file_path, es_index):
@@ -138,20 +135,22 @@ def generate_actions(csv_file_path, es_index):
                 if key in date_keys:
                     row[key] = update_date(value)
 
+                # We need to convert the string values to boolean values.
+                boolean_keys = {"trimet.inCongestion", "trimet.newTrip", "trimet.offRoute"}
+                if key in boolean_keys:
+                    row[key] = value.lower() == "true"
+
             # Add @timestamp field based on 'trimet.time' field.
             row["@timestamp"] = row["trimet.time"]
 
-            # Generate a unique _id using a hash of trimet.location and trimet.vehicleID
-            # and trimet.time
-            hash_keys = {"trimet.time", "trimet.vehicleID", "trimet.location"}
-            if all(key in row for key in hash_keys):
-                # Concatenate the required values efficiently
-                hash_input = "".join(row[key] for key in hash_keys)
-
-                # Compute the SHA-256 hash and get the hexadecimal digest in one step
-                record_hash = hashlib.sha256(hash_input.encode("utf-8")).hexdigest()
-            else:
-                record_hash = None
+            # Convert dict to a JSON string with sorted keys for deterministic ordering
+            dict_str = json.dumps(row, sort_keys=True)
+    
+            # Encode the string and compute the SHA256 hash
+            hash_obj = hashlib.sha256(dict_str.encode("utf-8"))
+    
+            # Return the hex digest
+            record_hash = hash_obj.hexdigest()
 
             # Yield an action formatted for Elasticsearch
             yield {"_index": es_index, "_id": record_hash, "_source": row}
