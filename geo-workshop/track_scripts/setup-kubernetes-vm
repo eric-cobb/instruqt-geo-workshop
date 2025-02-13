@@ -391,7 +391,7 @@ report_status " -- complete"
 
 # Upload CSV data to Elasticsearch
 report_status "Uploading Trimet CSV data to Elasticsearch"
-python3 upload-csv-elasticsearch.py --csv trimet-geo-workshop-data.csv --host $ELASTICSEARCH_URL --password $ELASTICSEARCH_PASSWORD
+python3 upload-csv-elasticsearch.py --csv data-files/33-to-clackamas-town-center.csv --host $ELASTICSEARCH_URL --password $ELASTICSEARCH_PASSWORD
 report_status " -- complete"
 
 # Upload GeoJSON data to Elasticsearch

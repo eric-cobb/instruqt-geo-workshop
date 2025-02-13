@@ -42,10 +42,13 @@ In Lab 1, you will get hands-on experience using Discover to learn about the dat
 
 ## Discover Overview
 ===
-Kibana requires a data view to access your Elasticsearch data. A data view can point to one or more indices, data streams, or index aliases. When adding data to Elasticsearch using one of the many integrations available, data views are often created automatically, but you can also create your own.
+This section of the lab provides you an overview of the `Discover` application.
 
 ### Data View
+Kibana requires a data view to access your Elasticsearch data. A data view can point to one or more indices, data streams, or index aliases. When adding data to Elasticsearch using one of the many integrations available data views are often created automatically, but you can also create your own.
+
 You interact with your data sources in Kibana via `Data Views`. Select the data view to choose which set of data you want to analyze.
+
 <details>
 	<summary>Hint</summary>
 	<img src="../assets/geo-workshop-discover-data-view-pointer.png" />
@@ -80,7 +83,7 @@ You can explore the number of records over time using the `Histogram`. This visu
 </details>
 
 ### Search Results
-Matching records or documents for your queries, filters and time range are displayed in the `Search Results`.  The search results shows you the record details and allows you to customize how those records are displayed.
+Matching records or documents for your queries, filters and time range are displayed in the `Search Results`. The search results shows you the record details and allows you to customize how those records are displayed.
 <details>
 	<summary>Hint</summary>
 	<img src="../assets/geo-workshop-discover-search-results.png" />
@@ -89,6 +92,7 @@ Matching records or documents for your queries, filters and time range are displ
 
 ## Fields and Filters
 ===
+Kibana enables you to interactively query data in fields to create filters without having to know complex query languages.
 
 ### Field: trimet.vehicleID
 The field list allows you to easily find fields present in your data, see metadata about the field values, and quickly filter your data based on the field values.
@@ -124,7 +128,7 @@ The summary of top values is based on a sample of records. How many records were
 3001
 </details>
 
-Filter the results for `trimet.vehicleID` `3551`. You can do this by clicking the circle-plus icon.  How many records are there?
+Filter the results for `trimet.vehicleID` `3551`. You can do this by clicking the circle-plus icon. How many records are there?
 <details>
 	<summary>Hint</summary>
 	<img src="../assets/geo-workshop-discover-vehicleid-filter-query.png" />
@@ -143,35 +147,29 @@ Filter the results for `trimet.vehicleID` `3551`. You can do this by clicking th
 
 ## Date and Time
 ===
+Most data sources will have a timestamp component to them. Kibana enables you to easily filter your data based on the timestamps in the data.
 
-
-## Saved Searches
-===
-
+### Time Picker Options
+You have already been exposed the `Time Picker` in Kibana. When you click on the calendar icon in the Time Picker, there are 2 groups of reconfigured time ranges. What are those groups?
 
 <details>
 	<summary>Hint</summary>
-		<img src="../assets/switch-s.png" alt="Devtools switch" />
+	<img src="../assets/geo-workshop-discover-time-picker-calendar.png" />
 </details>
 
-<code><pre>
-source-command
-| processing-command1
-| processing-command2
-</pre></code>
+<details>
+	<summary>Answer</summary>
+`Commonly used` and `Recently use date ranges`
+</details>
 
-```
-POST /_query
-{
-  "query": """
-    from apache-logs
-    | limit 10
-  """
-}
-```
+## Saved Searches
+===
+Kibana allows you to save your searches in
+
+
 
 ## Conclusion
 ===
-In this lab, you've learned the basic structure of ES|QL commands and where to run them. This foundational knowledge will be instrumental as you progress through more complex ES|QL features in upcoming labs.
+In this lab, you've learned the basics of using the Discover tool within Kibana to interact with and analyze your data. The Discovery tool is useful for all types of data. Understanding how to use Discovery is foundational knowledge which will be instrumental as you progress through more labs in this workshop and in real world scenarios.
 
 Congratulations, you have completed Lab 1. Click the **Next** button to proceed to Lab 2.
