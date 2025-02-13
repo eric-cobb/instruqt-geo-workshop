@@ -17,7 +17,7 @@ tabs:
   title: Kibana
   type: service
   hostname: kubernetes-vm
-  path: /app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,value:60000),time:(from:now-14d%2Fh,to:now))
+  path: /app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,value:60000),time:(from:now-24h%2Fh,to:now))
   port: 30001
   custom_request_headers:
   - key: Content-Security-Policy
