@@ -150,7 +150,7 @@ Filter the results for `trimet.vehicleID` `3551`. You can do this by clicking th
 Most data sources will have a timestamp component to them. Kibana enables you to easily filter your data based on the timestamps in the data.
 
 ### Time Picker Options
-You have already been exposed the `Time Picker` in Kibana. When you click on the calendar icon in the Time Picker, there are 2 groups of reconfigured time ranges. What are those groups?
+You have already been exposed the `Time Picker` in Kibana. When you click on the calendar icon in the Time Picker, there are 2 groups of preconfigured timestamp ranges. What are those groups?
 
 <details>
 	<summary>Hint</summary>
@@ -162,6 +162,19 @@ You have already been exposed the `Time Picker` in Kibana. When you click on the
 `Commonly used` and `Recently use date ranges`
 </details>
 
+In the `Commonly used` group of timestamps, what are 2 available selections of timestamps.
+
+<details>
+	<summary>Hint</summary>
+	<img src="../assets/geo-workshop-discover-time-picker-calendar-commonly-used.png" />
+</details>
+
+<details>
+	<summary>Answer</summary>
+`Today`, `Last 24 hours`, and `Last 1 year` are some of the preconfigured timestamps.
+</details>
+
+
 ## Saved Searches
 ===
 Kibana allows you to save your searches in
@@ -172,4 +185,4 @@ Kibana allows you to save your searches in
 ===
 In this lab, you've learned the basics of using the Discover tool within Kibana to interact with and analyze your data. The Discovery tool is useful for all types of data. Understanding how to use Discovery is foundational knowledge which will be instrumental as you progress through more labs in this workshop and in real world scenarios.
 
-Congratulations, you have completed Lab 1. Click the **Next** button to proceed to Lab 2.
+Congratulations, you have completed Lab 2. Click the **Next** button to proceed to the next lab.
