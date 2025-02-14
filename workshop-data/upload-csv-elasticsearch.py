@@ -85,10 +85,7 @@ def update_date(date: str, days: int) -> str:
     current_utc = datetime.now(timezone.utc)
 
     # Subtract the number of days from the current date
-    if days is not None or days > 0:
-        day_minus_utc = current_utc - timedelta(days=days) 
-    else:
-        day_minus_utc = current_utc
+    day_minus_utc = current_utc - timedelta(days=days) 
 
     # Convert the UTC datetime object to string format
     date_minus_utc = day_minus_utc.strftime(date_format)

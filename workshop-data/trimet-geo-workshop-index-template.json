@@ -5,7 +5,8 @@
     "settings": {
       "index": {
         "sort.field": "trimet.routeNumber.keyword",
-        "sort.order": "asc"
+        "sort.order": "asc",
+        "refresh_interval": "1s"
       }
     },
     "mappings": {
