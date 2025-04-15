@@ -4,6 +4,24 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "${SCRIPT_DIR}"
 
+
+# -----------------------------------------------------------------------------
+# The ES_VERSION is used for Python elasticsearch module and Elasticsearch cluster.  The Python module version is not always
+# in-sync with the Elasticsearch cluster version.  If you receive an error like:
+# 
+# ERROR: No matching distribution found for elasticsearch==8.17.4
+# 
+# then you need to verify the latest version of the Elasticsearch python module.
+# -----------------------------------------------------------------------------
+ES_VERSION=8.17.2
+
+# -----------------------------------------------------------------------------
+# NUM_DAYS is the number of days to replicate the source data files as well a how many days delta to add to the placeholder
+# date in the source data files.   Setting the value to 0 will create 1 day worth of data files with the date set to the
+# current date the script is run.
+# -----------------------------------------------------------------------------
+NUM_DAYS=0
+
 # -----------------------------------------------------------------------------
 # Helper function to retry a command with exponential backoff
 # -----------------------------------------------------------------------------
@@ -63,28 +81,28 @@ report_status "Python VENV: $PYTHON_ENV"
 # -----------------------------------------------------------------------------
 # Find a suitable Python command
 # -----------------------------------------------------------------------------
-if [ -f "./venv/bin/python" ]; then
-    PYTHON="./venv/bin/python"
+if [ -f "$PYTHON_ENV/bin/python" ]; then
+    PYTHON="$PYTHON_ENV/bin/python"
 elif command -v python3 &> /dev/null; then
     PYTHON="python3"
 elif command -v python &> /dev/null; then
     PYTHON="python"
 else
-    echo "Error: No Python binary found in ./venv/bin/python, python3, or python!"
+    echo "Error: No Python binary found in $PYTHON_ENV/bin/python, python3, or python!"
     exit 1
 fi
 
 # -----------------------------------------------------------------------------
 # Find a suitable Pip command
 # -----------------------------------------------------------------------------
-if [ -f "./venv/bin/pip" ]; then
-    PIP="./venv/bin/pip"
+if [ -f "$PYTHON_ENV/bin/pip" ]; then
+    PIP="$PYTHON_ENV/bin/pip"
 elif command -v pip3 &> /dev/null; then
     PIP="pip3"
 elif command -v pip &> /dev/null; then
     PIP="pip"
 else
-    echo "Error: No Pip binary found in ./venv/bin/pip, pip3, or pip!"
+    echo "Error: No Pip binary found in $PYTHON_VENV/bin/pip, pip3, or pip!"
     exit 1
 fi
 
@@ -97,7 +115,7 @@ echo "Using Pip - Version: $PIP, PATH: $(command -v $PIP)"
 # Install required Python libraries
 # -----------------------------------------------------------------------------
 report_status "Installing Python libraries"
-"$PIP" install -q argparse elasticsearch pip --upgrade
+"$PIP" install -q tqdm argparse "elasticsearch==$ES_VERSION" pip --upgrade
 report_status " -- complete"
 
 # -----------------------------------------------------------------------------
@@ -159,7 +177,7 @@ fi
 
 # Download Elastic Start-Local Script
 report_status "Downloading Elastic Start-Local Script"
-curl -fsSL https://elastic.co/start-local | sh
+curl -fsSL https://elastic.co/start-local | sh -s -- -v $ES_VERSION
 report_status " -- complete"
 
 # Verify environment file exists
@@ -170,7 +188,7 @@ if [ ! -f "$ELASTIC_ENV_FILE" ]; then
     echo "Error: File '$ELASTIC_ENV_FILE' does not exist."
     exit 1
 fi
-report_status "-- complete"
+report_status " -- complete"
 
 # Load environment variables from the file
 report_status "Loading Elastic Start-Local environment variables from file"
@@ -203,11 +221,14 @@ report_status " -- complete"
 
 # Upload CSV data to Elasticsearch
 report_status "Uploading Trimet CSV data to Elasticsearch"
-report_status "Simulating 3 days of data"
-for days in {0..0}; do
+if [ "$NUM_DAYS" = "0" ]; then
+    report_status "Simulating 1 day of data"
+else
+    report_status "Simulating $NUM_DAYS days of data"
+fi
+
+for days in $(seq 0 $NUM_DAYS); do
     #for file in data-files/*.csv; do
-    # Using the 4 largest files for the workshop ~10K records for 1 day of data.
-#    for file in data-files/35-greeley-to-univ-portland.csv data-files/35-to-oregon-city-tc.csv data-files/33-to-clackamas-college.csv data-files/33-to-clackamas-town-center.csv; do
     for file in data-files/33-to-clackamas-town-center.csv; do
         "$PYTHON" upload-csv-elasticsearch.py --csv $file --host "$ES_LOCAL_URL" --username elastic --password "$ES_LOCAL_PASSWORD" --index trimet-geo-workshop-data  --filter "<DATE>" --days $days 
     done
