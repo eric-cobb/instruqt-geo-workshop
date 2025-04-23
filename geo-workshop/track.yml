@@ -13,8 +13,8 @@ tags:
 - geo
 owner: elastic
 developers:
-- eric.cobb@elastic.co
 - michael.young@elastic.co
+- eric.cobb@elastic.co
 instructors:
 - brad.timmerman@elastic.co
 - adi.wasserman@elastic.co
@@ -63,6 +63,7 @@ instructors:
 - nicole.albee@elastic.co
 - florian.jacobs@elastic.co
 - michael.luer@elastic.co
+- eric.cobb@elastic.co
 maintenance: true
 show_timer: true
 idle_timeout: 3600
@@ -78,5 +79,5 @@ lab_config:
   hideStopButton: true
   default_layout: AssignmentRight
   default_layout_sidebar_size: 33
-checksum: "18045054912370124775"
+checksum: "17150618641617256548"
 enhanced_loading: false

@@ -20,7 +20,7 @@ ES_VERSION=8.17.2
 # date in the source data files.   Setting the value to 0 will create 1 day worth of data files with the date set to the
 # current date the script is run.
 # -----------------------------------------------------------------------------
-NUM_DAYS=0
+NUM_DAYS=1
 
 # -----------------------------------------------------------------------------
 # Helper function to retry a command with exponential backoff
@@ -221,13 +221,13 @@ report_status " -- complete"
 
 # Upload CSV data to Elasticsearch
 report_status "Uploading Trimet CSV data to Elasticsearch"
-if [ "$NUM_DAYS" = "0" ]; then
+if [ "$NUM_DAYS" = "1" ]; then
     report_status "Simulating 1 day of data"
 else
     report_status "Simulating $NUM_DAYS days of data"
 fi
 
-for days in $(seq 0 $NUM_DAYS); do
+for days in $(seq 1 $NUM_DAYS); do
     #for file in data-files/*.csv; do
     for file in data-files/33-to-clackamas-town-center.csv; do
         "$PYTHON" upload-csv-elasticsearch.py --csv $file --host "$ES_LOCAL_URL" --username elastic --password "$ES_LOCAL_PASSWORD" --index trimet-geo-workshop-data  --filter "<DATE>" --days $days 
