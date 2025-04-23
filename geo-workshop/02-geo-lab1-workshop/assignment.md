@@ -159,7 +159,7 @@ You have already been exposed the `Time Picker` in Kibana. When you click on the
 
 <details>
 	<summary>Answer</summary>
-`Commonly used` and `Recently use date ranges`
+`Commonly used` and `Recently used date ranges`
 </details>
 
 In the `Commonly used` group of timestamps, what are 2 available selections of timestamps.
