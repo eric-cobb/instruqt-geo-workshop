@@ -179,7 +179,7 @@ In the `Commonly used` group of timestamps, what are 2 available selections of t
 ===
 A saved search is a convenient way to reuse a search that you’ve created in Discover. Saved Searches are good for adding search results to a dashboard, and can also serve as a foundation for building visualizations. The fields displayed in Discover, filters, search terms and time picker settings are all saved as part of a Save Search.
 
-### Choose Displayed Fields
+### Choosing Displayed Fields
 ===
 By default, Discover shows you a summarized view of documents and records.  Depending on the data, this view may not always be easy to read.  This is where choosing the fields you want to see displayed helps.
 
@@ -191,16 +191,33 @@ To select one more fields to be displayed, hover over or click the name of the f
 
 Let's add the `trimet.vehicleID` field to the results display.  Hover over or click on `trimet.vehicleID` in the Field List.  Click the `+` icon to add that field to the display.
 
+What happened to the results display?
+
+<details>
+	<summary>Hint</summary>
+You should notice that a new category, `Selected Fields`, was added to the Field List.  This shows you which fields have been added to the results display.  You should also notice the `Summary` field in the results display has been removed and `trimet.vehicleID` was added.
+</details>
+
 <details>
 	<summary>Answer</summary>
 	<img src="../assets/geo-workshop-discover-field-list-vehicleid.png" />
 </details>
 
-You should notice that a new category, `Selected Fields`, was added to the Field List.  This shows you which fields have been added to the results display.  You should also notice the `Summary` field in the results display has been removed and `trimet.vehicleID` was added.
+Now let's add `trimet.signMessage` to the results display.
 
+
+<details>
+	<summary>Hint</summary>
+You should notice the `trimet.signMessage` field was added to the `Selected Fields` section in the Field List. You should also notice the `trimet.signMessage` field was added to the results display.
+</details>
+
+<details>
+	<summary>Answer</summary>
+	<img src="../assets/geo-workshop-discover-field-list-signmessage.png" />
+</details>
 
 ## Conclusion
 ===
-In this lab, you've learned the basics of using the Discover tool within Kibana to interact with and analyze your data. The Discovery tool is useful for all types of data. Understanding how to use Discovery is foundational knowledge which will be instrumental as you progress through more labs in this workshop and in real world scenarios.
+In Lab 2 you've learned the basics of using the Discover tool within Kibana to interact with and analyze your data. The Discovery tool is useful for all types of data. Understanding how to use Discovery is foundational knowledge which will be instrumental as you progress through more labs in this workshop and in real world scenarios.
 
-Congratulations, you have completed Lab 2. Click the **Next** button to proceed to the next lab.
+Congratulations, you have completed Lab 1. Click the **Next** button to proceed to the next lab.
