@@ -6,7 +6,11 @@ title: 'Elastic Geo Lab 3: Dashboards [PLACEHOLDER]'
 teaser: Learn about Dashboards app in Kibana.
 notes:
 - type: text
-  contents: Please be patient as we set up the the lab 3 challenge.
+  contents: |-
+    ![logo-elastic-horizontal-color-reverse.png](../assets/logo-elastic-horizontal-color-reverse.png)
+
+
+              Please be patient as we set up Lab 3.
 tabs:
 - id: 3uclsq1oio4q
   title: Kibana

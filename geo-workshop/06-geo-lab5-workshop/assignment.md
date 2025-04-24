@@ -6,7 +6,11 @@ title: 'Elastic Geo Lab 5: Ingest Pipelines [PLACEHOLDER]'
 teaser: Learn about Elasticsearch ingest pipelines.
 notes:
 - type: text
-  contents: Please be patient as we set up the the lab 5 challenge.
+  contents: |-
+    ![logo-elastic-horizontal-color-reverse.png](../assets/logo-elastic-horizontal-color-reverse.png)
+
+
+              Please be patient as we set up Lab 5.
 tabs:
 - id: l7ktjr5kfe2p
   title: Kibana

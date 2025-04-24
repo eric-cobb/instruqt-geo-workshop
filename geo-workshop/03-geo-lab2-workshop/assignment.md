@@ -6,7 +6,11 @@ title: 'Elastic Geo Lab 2: Maps [PLACEHOLDER]'
 teaser: Learn about the Maps app in Kibana.
 notes:
 - type: text
-  contents: Please be patient as we set up the the lab 2 challenge.
+  contents: |-
+    ![logo-elastic-horizontal-color-reverse.png](../assets/logo-elastic-horizontal-color-reverse.png)
+
+
+              Please be patient as we set up Lab 2.
 tabs:
 - id: tzkkux9rqj4u
   title: Kibana

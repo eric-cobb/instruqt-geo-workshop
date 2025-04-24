@@ -6,7 +6,11 @@ title: 'Elastic Geo Lab 4: Machine Learning Anomalies [PLACEHOLDER]'
 teaser: 'Machine Learning Anomalies: Learn about geospatial Machine Learning anomalies.'
 notes:
 - type: text
-  contents: Please be patient as we set up the the lab 4 challenge.
+  contents: |-
+    ![logo-elastic-horizontal-color-reverse.png](../assets/logo-elastic-horizontal-color-reverse.png)
+
+
+              Please be patient as we set up Lab 4.
 tabs:
 - id: 5uqtjo5clkpp
   title: Kibana

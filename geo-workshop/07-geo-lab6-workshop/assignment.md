@@ -6,7 +6,11 @@ title: 'Elastic Geo Lab 6:  ES|QL + Geo [PLACEHOLDER]'
 teaser: Learn about using ES|QL with Geospatial data.
 notes:
 - type: text
-  contents: Please be patient as we set up the the lab 6 challenge.
+  contents: |-
+    ![logo-elastic-horizontal-color-reverse.png](../assets/logo-elastic-horizontal-color-reverse.png)
+
+
+              Please be patient as we set up Lab 6.
 tabs:
 - id: livkbffwyyom
   title: Kibana
