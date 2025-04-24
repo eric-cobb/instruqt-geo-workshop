@@ -287,6 +287,24 @@ If you are happy with the information you have entered, click on the `Save` butt
 	<img src="../assets/geo-workshop-discover-save-breadcrumb.png" />
 </details>
 
+### Loading a saved search
+Once you have saved a search, you can easily load that saved search.  This makes it easy to alternate between different, potentially complex searches, without having to recreate them everytime.
+
+In the upper right corner for Discovery, we will create a new search.  This will reset Discover to the default view.  Click the `+` icon to create a new search.
+
+<details>
+	<summary>Hint</summary>
+	<img src="../assets/geo-workshop-discover-search-new.png" />
+</details>
+
+You should notice that Discover has been reset.  The search result fields display `@timestamp` and `summary`.  The Discover breadcrumb in the upper right now longer displays the name of a saved search.
+
+<details>
+	<summary>Hint</summary>
+	<img src="../assets/geo-workshop-discover-search-reset.png" />
+</details>
+
+
 ## Conclusion
 ===
 In Lab 2 you've learned the basics of using the Discover tool within Kibana to interact with and analyze your data. The Discovery tool is useful for all types of data. Understanding how to use Discovery is foundational knowledge which will be instrumental as you progress through more labs in this workshop and in real world scenarios.
