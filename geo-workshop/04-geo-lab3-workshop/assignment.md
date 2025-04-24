@@ -12,7 +12,7 @@ tabs:
   title: Kibana
   type: service
   hostname: kubernetes-vm
-  path: /app/discover#/view/fb5396f0-4c2e-11ee-a369-9fe9cf70b370?_g=(filters:!(),refreshInterval:(pause:!t,value:60000),time:(from:now-2y,to:now))
+  path: /app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,value:60000),time:(from:now-48h,to:now))&_a=(columns:!(),dataSource:(dataViewId:trimet-geo-workshop-data,type:dataView),filters:!(),interval:auto,query:(language:kuery,query:''),sort:!(!('@timestamp',desc)))
   port: 30001
   custom_request_headers:
   - key: Content-Security-Policy
@@ -22,10 +22,6 @@ tabs:
   - key: Content-Security-Policy
     value: 'script-src ''self''; worker-src blob: ''self''; style-src ''unsafe-inline''
       ''self'''
-- id: zons3fekvhsd
-  title: host
-  type: terminal
-  hostname: kubernetes-vm
 difficulty: ""
 timelimit: 600
 enhanced_loading: null
