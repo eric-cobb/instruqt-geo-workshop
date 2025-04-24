@@ -178,7 +178,6 @@ A saved search is a convenient way to reuse a search that you’ve created in Di
 By default, a saved search stores the query text, filters, and current view of Discover, including the columns and sort order in the document table, and the data view.
 
 ### Choosing Displayed Fields
-===
 By default, Discover shows you a summarized view of documents and records.  Depending on the data, this view may not always be easy to read.  This is where choosing the fields you want to see displayed helps.
 
 <img src="../assets/geo-workshop-discovery-default-fields.png" />
@@ -227,7 +226,6 @@ You should notice the `trimet.bearing` field was added to the `Selected Fields` 
 </details>
 
 ### Saving your search
-===
 Once you have your field list setup, it's time to save this search for later use.  To save a search, click on the `Save` button in the upper right corner of the Kibana Discover UI.
 
 <img src="../assets/geo-workshop-discover-save-button.png" />
@@ -237,7 +235,6 @@ This is should open the `Save search` diaglog box.
 <img src="../assets/geo-workshop-discover-save-dialog.png" />
 
 #### Title
-===
 You can give your saved search a a custom name.  We recommend you use a naming convention that makes it easy to understand the query, filters and data view associated with the data source.
 
 Give your saved search the name "Trimet Saved Search".
@@ -248,7 +245,6 @@ Give your saved search the name "Trimet Saved Search".
 </details>
 
 #### Description
-===
 You can provide a more detailed description of your saved search.  This is optional, but recommended.
 
 Provide more detailed information such as field names used, time ranges, etc.
@@ -259,7 +255,6 @@ Provide more detailed information such as field names used, time ranges, etc.
 </details>
 
 #### Tags
-===
 You can select from existing `tags` or create new ones.  This makes it easier to find related content and assets when searching for tags.
 
 We don't yet have any tags in the system.  Click in the tag entry box.  Enter the tag name `trimet`.  To save this tag, create the `Create tag` option.
@@ -283,7 +278,6 @@ Click the `Create tag` button to save the tag.
 You should notice the original `Saved search` dialog box is displayed.  You should also notice that the tag you created is displayed and color coded.
 
 #### Store Time
-===
 Sometimes you want to have the time picker associated with your query saved with the search.  You have the option to enable saving the time.
 
 If you are happy with the information you have entered, click on the `Save` button to save your search.  You should notice the Discover window will refresh.  In the upper left corner of Discover, you can see the name of the saved search is now displayed.  This is how you can easily tell if you are viewing a saved search in Discover.
