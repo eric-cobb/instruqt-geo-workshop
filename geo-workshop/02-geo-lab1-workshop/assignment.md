@@ -304,6 +304,23 @@ You should notice that Discover has been reset.  The search result fields displa
 	<img src="../assets/geo-workshop-discover-search-reset.png" />
 </details>
 
+Now we will load the saved search we previously created. Click on the `folder` icon in the upper right corner of Discover.
+
+<details>
+	<summary>Hint</summary>
+	<img src="../assets/geo-workshop-discover-search-load.png" />
+</details>
+
+
+You should notice an `Open search` dialog box open. It provides a search box for you to find saved searches based on name. You should see only a single saved search.  Click on the saved search to load it.
+
+You should notice that Discover has been updated and now displays the previously saved search.  The breadcrumb displays the saved search name and the search results displays the selected fields saved as part of the search.
+
+<details>
+	<summary>Hint</summary>
+	<img src="../assets/geo-workshop-discover-search-load-complete.png" />
+</details>
+
 
 ## Conclusion
 ===
