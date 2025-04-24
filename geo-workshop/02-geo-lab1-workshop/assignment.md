@@ -16,7 +16,7 @@ tabs:
   title: Kibana
   type: service
   hostname: kubernetes-vm
-  path: /app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,value:60000),time:(from:now-24h%2Fh,to:now))
+  path: /app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,value:60000),time:(from:now-48h,to:now))&_a=(columns:!(),dataSource:(dataViewId:trimet-geo-workshop-data,type:dataView),filters:!(),interval:auto,query:(language:kuery,query:''),sort:!(!('@timestamp',desc)))
   port: 30001
   custom_request_headers:
   - key: Content-Security-Policy
@@ -26,10 +26,6 @@ tabs:
   - key: Content-Security-Policy
     value: 'script-src ''self''; worker-src blob: ''self''; style-src ''unsafe-inline''
       ''self'''
-- id: nrqhkrmfv4vf
-  title: Virtual Browser
-  type: browser
-  hostname: kibana-virtual
 difficulty: ""
 timelimit: 600
 enhanced_loading: null
@@ -179,6 +175,8 @@ In the `Commonly used` group of timestamps, what are 2 available selections of t
 ===
 A saved search is a convenient way to reuse a search that you’ve created in Discover. Saved Searches are good for adding search results to a dashboard, and can also serve as a foundation for building visualizations. The fields displayed in Discover, filters, search terms and time picker settings are all saved as part of a Save Search.
 
+By default, a saved search stores the query text, filters, and current view of Discover, including the columns and sort order in the document table, and the data view.
+
 ### Choosing Displayed Fields
 ===
 By default, Discover shows you a summarized view of documents and records.  Depending on the data, this view may not always be easy to read.  This is where choosing the fields you want to see displayed helps.
@@ -204,7 +202,6 @@ You should notice that a new category, `Selected Fields`, was added to the Field
 </details>
 
 Now let's add `trimet.signMessage` to the results display.
-
 
 <details>
 	<summary>Hint</summary>

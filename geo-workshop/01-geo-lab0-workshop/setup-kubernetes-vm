@@ -1,0 +1,142 @@
+#!/bin/bash
+
+# -----------------------------------------------------------------------------
+# This is the setup script for the Geo Workshop.  It install required git, python
+# packages and the necessary python modules.  It loads a sample set of geo data
+# into an Elasticsearch cluster.
+# -----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
+# Function to report status messages reducing duplication of echo commands
+# -----------------------------------------------------------------------------
+
+report_status()
+{
+    echo ""
+    echo -e "$@"
+    echo ""
+}
+
+# -----------------------------------------------------------------------------
+# Install git, python, pip and python modules
+# -----------------------------------------------------------------------------
+
+# Install git, python and pip
+report_status "Install git, python, and pip"
+apt -y update
+apt install -y build-essential libssl-dev libffi-dev python3-dev
+apt install -y git python3 python3-pip
+report_status " -- complete"
+
+# Install required Python libraries
+report_status "Installing Python libraries"
+pip install -q argparse elasticsearch=="8.17.2" tqdm pip --upgrade
+report_status " -- complete"
+
+# -----------------------------------------------------------------------------
+# Setup .env file
+# -----------------------------------------------------------------------------
+
+# Store settings in .env file
+echo 'ELASTICSEARCH_USERNAME=elastic' >> .env
+# echo without newline
+echo -n 'ELASTICSEARCH_PASSWORD=' >> .env
+# read password from kubectl get secret elasticsearch-es-elastic-user -o go-template='{{.data.elastic | base64decode}}', save to file as ELASTICSEARCH_PASSWORD=$value
+kubectl get secret elasticsearch-es-elastic-user -n default -o go-template='{{.data.elastic | base64decode}}' >> .env
+echo '' >> .env
+
+echo 'ELASTICSEARCH_URL="http://localhost:30920"' >> .env
+echo 'KIBANA_URL="http://localhost:30002"' >> .env
+echo 'ELASTIC_VERSION="8.17.2"' >> .env
+echo 'ELASTIC_APM_SERVER_URL=http://apm.default.svc:8200' >> .env
+echo 'ELASTIC_APM_SECRET_TOKEN=pkcQROVMCzYypqXs0b' >> .env
+
+export $(cat .env | xargs) 
+
+# BASE64 username and password for use with curl basic auth
+export BASE64=$(echo -n "elastic:${ELASTICSEARCH_PASSWORD}" | base64)
+export KIBANA_URL_WITHOUT_PROTOCOL=$(echo $KIBANA_URL | sed -e 's#http[s]\?://##g')
+
+# -----------------------------------------------------------------------------
+# Clone geo-workshop git repo
+# -----------------------------------------------------------------------------
+
+report_status "Downloading workshop git repo for sample data"
+git clone https://github.com/eric-cobb/instruqt-geo-workshop.git
+DATA_DIR="instruqt-geo-workshop/workshop-data"
+report_status " -- complete"
+
+echo "Data Directory: $DATA_DIR"
+cd $DATA_DIR
+
+# -----------------------------------------------------------------------------
+# Upload trimet index tempalte to Elasticsearch
+# -----------------------------------------------------------------------------
+
+report_status "Uploading Elasticsearch index template for sample data"
+curl --silent --show-error --fail -X PUT "$ELASTICSEARCH_URL/_index_template/trimet-geo-workshop-template" \
+-H "Content-Type: application/json" \
+-H "Authorization: Basic $BASE64" \
+-d @trimet-geo-workshop-index-template.json
+report_status " -- complete"
+
+# -----------------------------------------------------------------------------
+# Upload Portland GeoJSON index template to Elasticsearch
+# -----------------------------------------------------------------------------
+
+report_status "Uploading Elasticsearch index template for Portland GeoJSON data"
+curl --silent --show-error --fail -X PUT "$ELASTICSEARCH_URL/_index_template/portland-geojson-template" \
+-H "Content-Type: application/json" \
+-H "Authorization: Basic $BASE64" \
+-d @portland-geojson-index-template.json
+report_status " -- complete"
+
+
+# -----------------------------------------------------------------------------
+# Upload triment data to Elasticsearch
+# -----------------------------------------------------------------------------
+
+NUM_DAYS=1
+INDEX_NAME="trimet-geo-workshop-data"
+FILTER="<DATE>"
+
+report_status "Uploading Trimet CSV data to Elasticsearch"
+if [ "$NUM_DAYS" = "1" ]; then
+    report_status "Simulating 1 day of data"
+else
+    report_status "Simulating $NUM_DAYS days of data"
+fi
+
+for days in $(seq 1 $NUM_DAYS); do
+    #for file in data-files/*.csv; do
+    for file in data-files/33-to-clackamas-town-center.csv; do
+        echo "Uploading data file: $file"
+        python3 upload-csv-elasticsearch.py --csv $file --host "$ELASTICSEARCH_URL" --username elastic --password "$ELASTICSEARCH_PASSWORD" --index "$INDEX_NAME"  --filter "$FILTER" --days $days 
+    done
+done
+report_status " -- complete"
+
+# -----------------------------------------------------------------------------
+# Upload GeoJSON data to Elasticsearch
+# -----------------------------------------------------------------------------
+
+report_status "Uploading GeoJSON data to Elasticsearch"
+python3 upload-geojson-elasticsearch.py --json portland-geojson.json --host $ELASTICSEARCH_URL --password $ELASTICSEARCH_PASSWORD
+report_status " -- complete"
+
+# -----------------------------------------------------------------------------
+# Upload Trimet dataview to Kibana
+# -----------------------------------------------------------------------------
+
+report_status "Uploading Trimet dataview to Kibana"
+curl \
+ -X POST $KIBANA_URL/api/data_views/data_view \
+ -H "Authorization: Basic $BASE64" \
+ -H "Content-Type: application/json; Elastic-Api-Version=2023-10-31" \
+ -H "kbn-xsrf: string" \
+ -d @trimet-geo-workshop-dataview.json
+report_status " -- complete"
+
+report_status "Data upload complete"
+
+report_status "Bootstrap script completed successfully!"

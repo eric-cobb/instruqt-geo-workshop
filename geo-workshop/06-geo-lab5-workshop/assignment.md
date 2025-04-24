@@ -1,14 +1,14 @@
 ---
-slug: geo-lab4-workshop
-id: fknldrj1tup9
+slug: geo-lab5-workshop
+id: egxuiyqry1p4
 type: challenge
-title: 'Elastic Geo Lab 6: Machine Learning Anomalies [PLACEHOLDER]'
-teaser: 'Machine Learning Anomalies: Learn about geospatial Machine Learning anomalies.'
+title: 'Elastic Geo Lab 5: Ingest Pipelines [PLACEHOLDER]'
+teaser: Learn about Elasticsearch ingest pipelines.
 notes:
 - type: text
-  contents: Please be patient as we set up the the lab 4 challenge.
+  contents: Please be patient as we set up the the lab 5 challenge.
 tabs:
-- id: 5uqtjo5clkpp
+- id: l7ktjr5kfe2p
   title: Kibana
   type: service
   hostname: kubernetes-vm
@@ -22,7 +22,7 @@ tabs:
   - key: Content-Security-Policy
     value: 'script-src ''self''; worker-src blob: ''self''; style-src ''unsafe-inline''
       ''self'''
-- id: hldqydtehg4k
+- id: 1e3b4sw1oy9c
   title: host
   type: terminal
   hostname: kubernetes-vm
@@ -30,13 +30,13 @@ difficulty: ""
 timelimit: 600
 enhanced_loading: null
 ---
-In Lab 4 you will learn about ...
+In Lab 5 you will learn about ...
 
 ## Section
 ===
 
 ## Conclusion
 ===
-In lab 4 you learned about ...
+In lab 5 you learned about ...
 
 Congratulations, you have completed Lab 5. Click the **Next** button to proceed to the next lab.
