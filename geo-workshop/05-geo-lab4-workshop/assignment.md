@@ -26,6 +26,10 @@ tabs:
   - key: Content-Security-Policy
     value: 'script-src ''self''; worker-src blob: ''self''; style-src ''unsafe-inline''
       ''self'''
+- id: likwg7iozzqe
+  title: Terminal
+  type: terminal
+  hostname: kubernetes-vm
 difficulty: ""
 timelimit: 600
 enhanced_loading: null

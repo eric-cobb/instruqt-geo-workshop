@@ -131,6 +131,6 @@ The `instruqt track pull` and `instruqt track push` commands will update content
 
 When there are conflicts performing a track pull or track push, it is often related to changes in track.yml.  Performing a `instruqt track pull` to fectch the current `live` version of the workshop can resolve these conflicts.
 
-When there are conlicts, Instruqt will create *.remote files.  To resolve the conflicts, diff the local and .remote versions of the file and manually merge the changes.  Once you have done that you, can `instruqt track push`.
+When there are conlicts, Instruqt will create *.remote files.  To resolve the conflicts, diff the local and `.remote` versions of the file and manually merge the changes.  Once you have done that you, can `instruqt track push`.
 
 Once you have completed your updates, don't forget to merge your updates in to `git`.
