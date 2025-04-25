@@ -91,11 +91,25 @@ The high-level workflow for creating content for an Instruqt workshop is:
 
 For users or developers to see any new or updated content, you need to push that content to Insruqt.
 
+To pull remote updates from Instruqt:
+
+```bash
+instruqt track pull
+```
+To validate your local changes:
+
+```bash
+instruqt track validate
+```
+
+To push local updates to Instruqt:
+
 ```bash
 instruqt track push
 ```
 
 If this process completes without errors, then you need to push your changes to git. Think of this as testing the workshop.
+
 You should test your updates before pushing those changes to git to avoid any issues/conflicts that might arise.
 
 ```bash
@@ -105,6 +119,7 @@ git push
 ```
 
 If multiple developers are working on a workshop at the same time, you may run into conficts when you try to `instruqt track push`.
+
 This is similar in nature to git merge issues. Before pushing your changes to Instruqt, it's a good idea to pull the latest
 track version.
 
@@ -112,7 +127,10 @@ track version.
 instruqt track pull
 ```
 
-The `instruqt track pull` and `instruqt track push` commands will update content in the workshop `track.yml` file.  This file
-contains a checksum and other workshop metadata that may be updated within the Instruqt environment itself. When there are
-conflicts performing a track pull or track push, it is often related to changes in track.yml.  Performing a `instruqt track pull`
-to fectch the current `live` version of the workshop can resolve these conflicts.  
+The `instruqt track pull` and `instruqt track push` commands will update content in the workshop `track.yml` file.  This file contains a checksum and other workshop metadata that may be updated within the Instruqt environment itself.
+
+When there are conflicts performing a track pull or track push, it is often related to changes in track.yml.  Performing a `instruqt track pull` to fectch the current `live` version of the workshop can resolve these conflicts.
+
+When there are conlicts, Instruqt will create *.remote files.  To resolve the conflicts, diff the local and .remote versions of the file and manually merge the changes.  Once you have done that you, can `instruqt track push`.
+
+Once you have completed your updates, don't forget to merge your updates in to `git`.
