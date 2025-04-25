@@ -43,8 +43,11 @@ In Lab 2 you will learn about how to use the Maps app in Kibana.  With Maps, you
 - Symbolize features using data values.
 - Focus on only the data that’s important to you.
 
-## Section
+You can find documentation on Kibana Maps here: https://www.elastic.co/docs/explore-analyze/visualize/maps
+
+## Maps Overview
 ===
+
 
 ## Conclusion
 ===
