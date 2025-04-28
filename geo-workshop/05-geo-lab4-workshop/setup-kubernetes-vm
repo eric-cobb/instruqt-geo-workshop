@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# -----------------------------------------------------------------------------
+# This is the setup script for the Geo Workshop.  It install required git, python
+# packages and the necessary python modules.  It loads a sample set of geo data
+# into an Elasticsearch cluster.
+# -----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
+# Function to report status messages reducing duplication of echo commands
+# -----------------------------------------------------------------------------
+
+report_status()
+{
+    echo ""
+    echo -e "$@"
+    echo ""
+}
+
+export $(cat .env | xargs) 
+
+# BASE64 username and password for use with curl basic auth
+export BASE64=$(echo -n "elastic:${ELASTICSEARCH_PASSWORD}" | base64)
+export KIBANA_URL_WITHOUT_PROTOCOL=$(echo $KIBANA_URL | sed -e 's#http[s]\?://##g')
+
+DATA_DIR="instruqt-geo-workshop/workshop-data"
+echo "Data Directory: $DATA_DIR"
+cd $DATA_DIR
+
+# -----------------------------------------------------------------------------
+# Upload triment data to Elasticsearch
+# -----------------------------------------------------------------------------
+
+NUM_DAYS=3
+INDEX_NAME="trimet-geo-workshop-data"
+FILTER="<DATE>"
+
+report_status "Uploading Trimet CSV data to Elasticsearch"
+if [ "$NUM_DAYS" = "1" ]; then
+    report_status "Simulating 1 day of data"
+else
+    report_status "Simulating $NUM_DAYS days of data"
+fi
+
+for days in $(seq 1 $NUM_DAYS); do
+    #for file in data-files/*.csv; do
+    for file in data-files/33-to-clackamas-town-center.csv; do
+        echo "Uploading data file: $file"
+        python3 upload-csv-elasticsearch.py --csv $file --host "$ELASTICSEARCH_URL" --username elastic --password "$ELASTICSEARCH_PASSWORD" --index "$INDEX_NAME"  --filter "$FILTER" --days $days 
+    done
+done
+report_status " -- complete"
+
+report_status "Data upload complete"
