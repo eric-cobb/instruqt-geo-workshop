@@ -26,7 +26,7 @@ tabs:
   - key: Content-Security-Policy
     value: 'script-src ''self''; worker-src blob: ''self''; style-src ''unsafe-inline''
       ''self'''
-- id: likwg7iozzqe
+- id: ectvi6yacvvz
   title: Terminal
   type: terminal
   hostname: kubernetes-vm
