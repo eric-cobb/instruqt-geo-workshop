@@ -154,6 +154,14 @@ Click on the `Save` button.
 
 You should notice the `Save maps` dialog box opens.  The dialog box gives you options for `Title`, `Description`, `Add to ashboard` and `Add to library`.  The `Title` enables you to give your map a unqiue, meaningful name.  The optional `Description` allows you to provide more detailed information informing other users about intent and data used in the map.  When saving a map, you have the option to add it to an exiting dashboard, a new dashboard, or not at all.  The option to save to the library allows other users to query for saved visualization and discover your map for usage in their dashboards.
 
+## Create a Map
+Now that you have an overview of the Maps app, let's create a new map.
+
+### Add a layer
+The first step in creating a map is to add a layer.  Click on the `Add layer` button.
+
+--- WORK IN PROGRESSS ---
+
 ## Conclusion
 ===
 In lab 2 you learned about ...
