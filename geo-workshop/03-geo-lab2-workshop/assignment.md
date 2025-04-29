@@ -47,7 +47,56 @@ You can find documentation on Kibana Maps here: https://www.elastic.co/docs/expl
 
 ## Maps Overview
 ===
+To access the Maps application in Kibana, click on the main menu icon in the upper left corner.  This is also known as the "hamburger menu."
 
+<details>
+	<summary>Hint</summary>
+	<img src="../assets/geo-workshop-kibana-hambuger-menu.png" />
+</details>
+
+The main menu in Kibana provides you quick access to all of the other applications within Kibana.
+
+<details>
+	<summary>Hint</summary>
+	<img src="../assets/geo-workshop-kibana-main-menu.png" />
+</details>
+
+The main menu groups the various Kibana applications according to use case.  The first group is the `Analytics` group which are applications broadly useful as part of the platform.
+
+<details>
+	<summary>Hint</summary>
+	<img src="../assets/geo-workshop-kibana-analytics-section.png" />
+</details>
+
+Within the analytics section you will find the Maps application.  Click on `Maps` to open the Maps application.  The maps applciation will open presenting you with a new basic map.
+
+<details>
+	<summary>Hint</summary>
+	<img src="../assets/geo-workshop-kibana-maps.png" />
+</details>
+
+### Filters
+The filters widget allows you to add terms to filter in or out of your documents displayed on the map.
+
+<details>
+	<summary>Hint</summary>
+	<img src="../assets/geo-workshop-maps-filter.png" />
+</details>
+
+If you click on the `+` icon, you can easily create new filters by using the provided query builder without having to understand complex query syntax.
+
+<details>
+	<summary>Hint</summary>
+	<img src="../assets/geo-workshop-maps-filter-add.png" />
+</details>
+
+### Query Input
+The query input box allows you to create more flexible queries than filters alone.
+
+<details>
+	<summary>Hint</summary>
+	<img src="../assets/geo-workshop-maps-query-box.png" />
+</details>
 
 ## Conclusion
 ===
