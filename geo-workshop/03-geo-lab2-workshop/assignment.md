@@ -43,7 +43,7 @@ In Lab 2 you will learn about how to use the Maps app in Kibana.  With Maps, you
 - Symbolize features using data values.
 - Focus on only the data that’s important to you.
 
-You can find documentation on Kibana Maps here: https://www.elastic.co/docs/explore-analyze/visualize/maps
+You can find documentation on Kibana Maps here: https://www.elastic.co/docs/explore-analyze/visualize/maps.  There is also a step-by-step tutorial that walks you through tracking, visualizing and alerting on geospatial assets in real time: https://www.elastic.co/guide/en/kibana/8.17/asset-tracking-tutorial.html.
 
 ## Maps Overview
 ===
@@ -76,7 +76,7 @@ Within the analytics section you will find the Maps application.  Click on `Maps
 </details>
 
 ### Filters
-The filters widget allows you to add terms to filter in or out of your documents displayed on the map.
+The filters widget allows you to add terms to filter in or out of your documents displayed on the map.  This widget functions the same as it does in the Discover app.
 
 <details>
 	<summary>Hint</summary>
@@ -91,12 +91,68 @@ If you click on the `+` icon, you can easily create new filters by using the pro
 </details>
 
 ### Query Input
-The query input box allows you to create more flexible queries than filters alone.
+The query input box allows you to create more flexible queries than filters alone.  This widget functions the same as it does in the Discover app.
 
 <details>
 	<summary>Hint</summary>
 	<img src="../assets/geo-workshop-maps-query-box.png" />
 </details>
+
+When you click in the query input box, the Maps app will show you a list of available fields.  This makes it easy to get started exploring your data when you aren't familiar with it.
+
+<details>
+	<summary>Hint</summary>
+	<img src="../assets/geo-workshop-maps-query-box-fields.png" />
+</details>
+
+Type `trimet` into the query input box. You should notice that the field is auotmatically updated as you type.  The list of fields displayed should now be filtered to only display fields that begin with `trimet.`.
+
+<details>
+	<summary>Hint</summary>
+	<img src="../assets/geo-workshop-maps-query-box-fields-trimet.png" />
+</details>
+
+### Time Picker
+You filter your data using dates and times with the `Time Picker`. Select the time range to narrow your view of the data based on date and time.  This widget functions the same as it does in the Discovery app.
+
+<details>
+	<summary>Hint</summary>
+	<img src="../assets/geo-workshop-maps-timepicker.png" />
+</details>
+
+### Layers
+The Map app allows you to create layers for your data.  To avoid overwhelming the user with too much data at once, you can add mutiple two layers for your Elasticsearch data. One layer can display individual documents when users zoom in on the map. Another layer will display aggregated data when users zoom the map out.
+
+<details>
+	<summary>Hint</summary>
+	<img src="../assets/geo-workshop-maps-layers.png" />
+</details>
+
+Click on the `Add layer` button.
+
+<details>
+	<summary>Hint</summary>
+	<img src="../assets/geo-workshop-maps-layers-add.png" />
+</details>
+
+You should notice a panel open that contains multiple options for adding layers to your map.
+
+### Save
+The save button allows you to save your maps.  This enables you to load maps within the Maps app in addition to adding maps to Dashboards.
+
+<details>
+	<summary>Hint</summary>
+	<img src="../assets/geo-workshop-maps-save.png" />
+</details>
+
+Click on the `Save` button.
+
+<details>
+	<summary>Hint</summary>
+	<img src="../assets/geo-workshop-maps-save-dialog.png" />
+</details>
+
+You should notice the `Save maps` dialog box opens.  The dialog box gives you options for `Title`, `Description`, `Add to ashboard` and `Add to library`.  The `Title` enables you to give your map a unqiue, meaningful name.  The optional `Description` allows you to provide more detailed information informing other users about intent and data used in the map.  When saving a map, you have the option to add it to an exiting dashboard, a new dashboard, or not at all.  The option to save to the library allows other users to query for saved visualization and discover your map for usage in their dashboards.
 
 ## Conclusion
 ===
